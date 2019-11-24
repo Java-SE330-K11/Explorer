@@ -417,11 +417,11 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         //lấy node được chọn
-        DefaultMutableTreeNode selectedNode;
+        DefaultMutableTreeNode selectedNode=null;
         
         if(openingInTable)
         { 
-            System.out.println("test"+tableIndex);
+            //System.out.println("test"+tableIndex);
             selectedNode=(DefaultMutableTreeNode)((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).getChildAt(tableIndex);
             Tree.expandPath(Tree.getLeadSelectionPath());
             openingInTable=false;
@@ -433,7 +433,8 @@ public class MainForm extends javax.swing.JFrame {
         }
             
       
-        String pathStr=(String)selectedNode.getUserObject();//duong dan file dang duoc chon
+        //duong dan file dang duoc chon
+        String pathStr=(String)selectedNode.getUserObject();
         java.io.File selectedFile =new File(pathStr);
         java.io.File[] pathss=selectedFile.listFiles();
         if(pathStr=="ThisPC") 
@@ -461,16 +462,16 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
          if(copy)
          {
-             String pasteS = saveSelectedNode.toString();
-              tmpS = pasteS.split("\\\\");
+            String pasteS = saveSelectedNode.toString();
+            tmpS = pasteS.split("\\\\");
             String tmp = new String();
             for (int i=0;i<tmpS.length;i++)
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
-             tmp+=tmpF;
-             System.out.println(tmp);
-             filePatsePath = new File(tmp);
+            tmp+=tmpF;
+            System.out.println(tmp);
+            filePatsePath = new File(tmp);
              if(fileCoppyPath.isFile()){
                  try{
                      FileUtils.copyFile(fileCoppyPath, filePatsePath); 
@@ -501,12 +502,12 @@ public class MainForm extends javax.swing.JFrame {
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
-             tmp+=tmpF;
-             System.out.println(tmp);
-             filePatsePath = new File(tmp);
-             System.out.println(filePatsePath.toString());
-             System.out.println(Clipboard.toString());
-             if(Clipboard.isFile()){
+            tmp+=tmpF;
+            System.out.println(tmp);
+            filePatsePath = new File(tmp);
+            System.out.println(filePatsePath.toString());
+            System.out.println(Clipboard.toString());
+            if(Clipboard.isFile()){
                  try{
                      FileUtils.copyFile(Clipboard, filePatsePath); 
                      loadTableWhenAction();
@@ -515,8 +516,8 @@ public class MainForm extends javax.swing.JFrame {
                          System.out.println("Nope");
                     }
                     Clipboard.delete();
-             }
-             else if(Clipboard.isDirectory()){
+            }
+            else if(Clipboard.isDirectory()){
                  try{
                      FileUtils.copyDirectory(Clipboard, filePatsePath); 
                      loadTableWhenAction();
@@ -531,7 +532,7 @@ public class MainForm extends javax.swing.JFrame {
                  {
                    System.out.println("Nope");   
                  }
-             } 
+            } 
              cut = false;
          }
 
@@ -541,9 +542,23 @@ public class MainForm extends javax.swing.JFrame {
     {
         String str=(String)saveSelectedNode.getUserObject();
         java.io.File selectedFile =new File(str);
-        System.out.println(str);
+        //System.out.println(str);
         //java.io.File selectedFile =(java.io.File)saveSelectedNode.getUserObject();
         java.io.File[] paths=selectedFile.listFiles();
+        
+        try{
+            saveSelectedNode.removeAllChildren();
+            File []fs=selectedFile.listFiles();
+            for(int i=0;i<fs.length;i++)
+                if(fs[i].isDirectory())
+                {
+                    saveSelectedNode.add(new DefaultMutableTreeNode(fs[i].getPath()));
+                }
+        }
+        catch(Exception ex){
+            
+        }
+        
         ShowInTable(paths);
     }
     
@@ -553,11 +568,31 @@ public class MainForm extends javax.swing.JFrame {
          //lấy node được chọn
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
-        selectedNode.removeAllChildren();
+        //selectedNode.removeAllChildren();
       
         String str=(String)selectedNode.getUserObject();
         java.io.File selectedFile =new File(str);
-        java.io.File[] paths = selectedFile.listFiles();
+        java.io.File[] pathfirst = selectedFile.listFiles();
+        int length=pathfirst.length;
+        int dem=0;
+        
+        paths = new File[length];
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory())
+            {
+                 paths[dem]=pathfirst[i];
+                 dem++;
+            }   
+        }
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory()==false)
+            {
+                paths[dem]=pathfirst[i];
+                dem++;
+            }       
+        }
         
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
         int SelectedRowIndex = Table.getSelectedRow();
@@ -677,7 +712,7 @@ public class MainForm extends javax.swing.JFrame {
         int row = source.rowAtPoint( evt.getPoint() );
         int column = source.columnAtPoint( evt.getPoint() );
         File s=(File)source.getModel().getValueAt(row, column);
-        System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
+        //System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
         if (evt.getClickCount() == 2 && source.getSelectedRow() != -1)
         {
             
@@ -687,17 +722,13 @@ public class MainForm extends javax.swing.JFrame {
                 else
                 {
                     DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
-                    while(tableModel.getRowCount() > 0)
-                        {
-                            tableModel.removeRow(0);
-                        }
-                    File[] paths=s.listFiles();
+                    //File[] paths=s.listFiles();
                     openingInTable=true;
                     tableIndex=row;
                   
                     TreeMouseClicked(evt);
                     
-                    ShowInTable(paths);
+                    //ShowInTable(paths);
                 }
             }
                     
