@@ -373,7 +373,7 @@ public class MainForm extends javax.swing.JFrame {
         Help.setText("Help");
         Help.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
-        itemAbout.setText("About");
+        itemAbout.setText("About us");
         Help.add(itemAbout);
 
         jMenuBar1.add(Help);

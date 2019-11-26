@@ -112,7 +112,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="itemAbout">
               <Properties>
-                <Property name="text" type="java.lang.String" value="About"/>
+                <Property name="text" type="java.lang.String" value="About us"/>
               </Properties>
             </MenuItem>
           </SubComponents>
