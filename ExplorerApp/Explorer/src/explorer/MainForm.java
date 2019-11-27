@@ -6,6 +6,7 @@
 package explorer;
 
 import java.awt.Color;
+import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -52,6 +53,8 @@ public class MainForm extends javax.swing.JFrame {
     String tmpF;
     boolean openingInTable=false;
     int tableIndex=-1;
+    boolean isUp=false;
+    boolean isGotoAddress=false;
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
@@ -163,7 +166,7 @@ public class MainForm extends javax.swing.JFrame {
         Help = new javax.swing.JMenu();
         itemAbout = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -197,14 +200,20 @@ public class MainForm extends javax.swing.JFrame {
         btnUp.setFocusable(false);
         btnUp.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnUp.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnUp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnUpMouseClicked(evt);
+            }
+        });
         jToolBar2.add(btnUp);
         jToolBar2.add(jSeparator2);
 
         lbAddress.setBackground(new java.awt.Color(255, 255, 255));
-        lbAddress.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lbAddress.setText("Address:");
+        lbAddress.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        lbAddress.setText("Address: ");
         jToolBar2.add(lbAddress);
 
+        textAddress.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         textAddress.setMinimumSize(new java.awt.Dimension(600, 22));
         textAddress.setPreferredSize(new java.awt.Dimension(600, 220));
         jToolBar2.add(textAddress);
@@ -214,6 +223,11 @@ public class MainForm extends javax.swing.JFrame {
         btnGoto.setText("Go to");
         btnGoto.setFocusable(false);
         btnGoto.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnGoto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnGotoMouseClicked(evt);
+            }
+        });
         jToolBar2.add(btnGoto);
 
         jToolBar1.setBackground(new java.awt.Color(255, 255, 255));
@@ -404,6 +418,11 @@ public class MainForm extends javax.swing.JFrame {
         Help.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         itemAbout.setText("About us");
+        itemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemAboutActionPerformed(evt);
+            }
+        });
         Help.add(itemAbout);
 
         jMenuBar1.add(Help);
@@ -433,7 +452,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         
-        if(saveSelectedNode!=null && openingInTable==false)
+        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isGotoAddress)
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
@@ -450,10 +469,24 @@ public class MainForm extends javax.swing.JFrame {
             openingInTable=false;
         }
         else 
-        {
-            ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
-            selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
-        }
+            if(isUp)
+            {
+                selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getParent();
+                selectedNode.removeAllChildren();
+                isUp=false;
+            }
+            else
+                if(isGotoAddress)
+                {
+                    selectedNode=new DefaultMutableTreeNode(textAddress.getText());
+                    selectedNode.removeAllChildren();
+                    isGotoAddress=false;
+                }
+                else
+                {
+                    ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
+                    selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+                }
             
       
         //duong dan file dang duoc chon
@@ -475,7 +508,7 @@ public class MainForm extends javax.swing.JFrame {
         
         Tree.setSelectionPath(new TreePath(selectedNode.getPath()));
         Tree.expandRow(selectedNode.getIndex(selectedNode));
-        
+        textAddress.setText((String)selectedNode.getUserObject());
         
     }//GEN-LAST:event_TreeMouseClicked
 
@@ -761,6 +794,38 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_TableMouseClicked
+
+    private void itemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAboutActionPerformed
+        // TODO add your handling code here:
+        AboutForm aboutForm=new AboutForm();
+        aboutForm.setVisible(true);
+    }//GEN-LAST:event_itemAboutActionPerformed
+
+    private void btnUpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnUpMouseClicked
+        // TODO add your handling code here:
+        if(saveSelectedNode.toString()=="ThisPC") return;
+        isUp=true;
+        TreeMouseClicked(evt);
+    }//GEN-LAST:event_btnUpMouseClicked
+
+    private void btnGotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGotoMouseClicked
+        // TODO add your handling code here:
+        File f = new File(textAddress.getText());
+        if (f.exists() && f.isDirectory()) {
+           isGotoAddress=true;
+           TreeMouseClicked(evt);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this,
+                                  "Please type the address again!",
+                                  "Wrong address",
+                                  JOptionPane.WARNING_MESSAGE);
+        }
+        //TÁCH CHUỖI
+        //xóa chuỗi ThisPC đầu (nếu có)
+        //vòng for cho treeMouseClick
+    }//GEN-LAST:event_btnGotoMouseClicked
 
     
     void ShowInTable(File[] paths)
