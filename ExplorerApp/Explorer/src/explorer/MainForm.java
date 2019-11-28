@@ -65,6 +65,7 @@ public class MainForm extends javax.swing.JFrame {
     
     private File[] paths;
     private DefaultMutableTreeNode saveSelectedNode=null;
+    private DefaultMutableTreeNode treeRoot=null;
     public MainForm() {
         initComponents();
         //Tree.setCellRenderer(new TreeNodeRender());
@@ -482,9 +483,7 @@ public class MainForm extends javax.swing.JFrame {
                 {
                     if(textAddress.getText().equals("ThisPC"))
                     {
-                        selectedNode=saveSelectedNode;
-                        while (selectedNode.getParent()!=null)
-                            selectedNode=(DefaultMutableTreeNode)selectedNode.getParent();
+                        selectedNode=treeRoot;
                     }
                     else
                     {
@@ -493,11 +492,11 @@ public class MainForm extends javax.swing.JFrame {
                             {
                                 selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getChildAt(i);
                             }
-                        //selectedNode=new DefaultMutableTreeNode(strCreateNode);
+                        
                         
                     }
                     selectedNode.removeAllChildren();
-                    //isGotoAddress=false;
+                   
                 }
                 else
                 {
@@ -850,6 +849,7 @@ public class MainForm extends javax.swing.JFrame {
             //Tạo node theo address cho tree
             isCreatingNode=true;
             strCreateNode="";
+            saveSelectedNode=treeRoot;
             for(int i=0;i<temp.length;i++)
             {
                 strCreateNode+=temp[i]+"\\";
@@ -858,8 +858,6 @@ public class MainForm extends javax.swing.JFrame {
             }
             isCreatingNode=false;
             
-            //isGotoAddress=true;
-            //TreeMouseClicked(evt);
         }
         else
         {
@@ -944,6 +942,7 @@ public class MainForm extends javax.swing.JFrame {
             model.reload();
         }
         saveSelectedNode=ThisPC;
+        treeRoot=saveSelectedNode;
     }
     
     private void loadTable()
