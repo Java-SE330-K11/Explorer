@@ -926,10 +926,12 @@ public class MainForm extends javax.swing.JFrame {
             return;
         if(index==0)
         {
+            index--;
             isBacking=true;
             strBack="ThisPC";
             TreeMouseClicked(evt);
             isBacking=false;
+            return;
         }
         isBacking=true;
         index--;
