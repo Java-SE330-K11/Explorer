@@ -55,6 +55,8 @@ public class MainForm extends javax.swing.JFrame {
     int tableIndex=-1;
     boolean isUp=false;
     boolean isGotoAddress=false;
+    boolean isCreatingNode=false;
+    String strCreateNode=null;
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
@@ -452,7 +454,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         
-        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isGotoAddress)
+        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode )//!isGotoAddress && )
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
@@ -476,11 +478,26 @@ public class MainForm extends javax.swing.JFrame {
                 isUp=false;
             }
             else
-                if(isGotoAddress)
+                if(isCreatingNode)
                 {
-                    selectedNode=new DefaultMutableTreeNode(textAddress.getText());
+                    if(textAddress.getText().equals("ThisPC"))
+                    {
+                        selectedNode=saveSelectedNode;
+                        while (selectedNode.getParent()!=null)
+                            selectedNode=(DefaultMutableTreeNode)selectedNode.getParent();
+                    }
+                    else
+                    {
+                        for(int i=0;i<saveSelectedNode.getChildCount();i++)
+                            if(((DefaultMutableTreeNode)saveSelectedNode.getChildAt(i)).getUserObject().equals(strCreateNode))
+                            {
+                                selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getChildAt(i);
+                            }
+                        //selectedNode=new DefaultMutableTreeNode(strCreateNode);
+                        
+                    }
                     selectedNode.removeAllChildren();
-                    isGotoAddress=false;
+                    //isGotoAddress=false;
                 }
                 else
                 {
@@ -508,6 +525,7 @@ public class MainForm extends javax.swing.JFrame {
         
         Tree.setSelectionPath(new TreePath(selectedNode.getPath()));
         Tree.expandRow(selectedNode.getIndex(selectedNode));
+        //Tree.expandPath(new TreePath(selectedNode.getPath()));
         textAddress.setText((String)selectedNode.getUserObject());
         
     }//GEN-LAST:event_TreeMouseClicked
@@ -810,10 +828,38 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnGotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGotoMouseClicked
         // TODO add your handling code here:
+        //Node được chọn là ThisPC
+        if(textAddress.getText().equals("ThisPC"))
+        {
+            isGotoAddress=true;
+            TreeMouseClicked(evt);
+            return;
+        }
+        
+        //Tách ThisPC ra khỏi chuỗi:
+        String[] temp=textAddress.getText().split("\\\\");
+        if(temp[0].equals("ThisPC"))
+        {
+            String tmp=textAddress.getText().substring(7, textAddress.getText().length());
+            textAddress.setText(tmp);
+            temp=textAddress.getText().split("\\\\");
+        }
+        
         File f = new File(textAddress.getText());
         if (f.exists() && f.isDirectory()) {
-           isGotoAddress=true;
-           TreeMouseClicked(evt);
+            //Tạo node theo address cho tree
+            isCreatingNode=true;
+            strCreateNode="";
+            for(int i=0;i<temp.length;i++)
+            {
+                strCreateNode+=temp[i]+"\\";
+                if(i>0) strCreateNode=strCreateNode.substring(0,strCreateNode.length()-1);
+                TreeMouseClicked(evt);
+            }
+            isCreatingNode=false;
+            
+            //isGotoAddress=true;
+            //TreeMouseClicked(evt);
         }
         else
         {
@@ -897,6 +943,7 @@ public class MainForm extends javax.swing.JFrame {
             //ThisPC.add(new DefaultMutableTreeNode(path));
             model.reload();
         }
+        saveSelectedNode=ThisPC;
     }
     
     private void loadTable()
