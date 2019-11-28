@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.List;
 import java.awt.datatransfer.Clipboard;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +43,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.apache.commons.io.FileUtils;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
+import java.util.Arrays;
 /**
  *
  * @author User
@@ -56,12 +60,15 @@ public class MainForm extends javax.swing.JFrame {
     boolean isUp=false;
     boolean isGotoAddress=false;
     boolean isCreatingNode=false;
+    boolean isBacking=false;
     String strCreateNode=null;
+    String strBack;
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
     private File filePatsePath;
-    
+    private ArrayList<String> saveNode = new ArrayList<>();
+    int index=-1;
     
     private File[] paths;
     private DefaultMutableTreeNode saveSelectedNode=null;
@@ -188,6 +195,11 @@ public class MainForm extends javax.swing.JFrame {
         btnBack.setFocusable(false);
         btnBack.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnBack.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnBack.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnBackMouseClicked(evt);
+            }
+        });
         jToolBar2.add(btnBack);
 
         btnForward.setBackground(new java.awt.Color(255, 255, 255));
@@ -455,7 +467,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         
-        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode )//!isGotoAddress && )
+        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking)
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
@@ -463,7 +475,29 @@ public class MainForm extends javax.swing.JFrame {
         
         //lấy node được chọn
         DefaultMutableTreeNode selectedNode=null;
-        
+
+        if(isBacking)
+        {
+            if(strBack.equals("ThisPC")) 
+                selectedNode=treeRoot;
+            else
+            {
+                selectedNode=saveSelectedNode;
+                for(int i=0;i<selectedNode.getChildCount();i++)
+                {
+                    DefaultMutableTreeNode tmp=(DefaultMutableTreeNode)selectedNode.getChildAt(i);
+                    String path=(String)tmp.getUserObject();
+                    if(path.equals(strBack)) 
+                    {
+                        selectedNode=tmp;
+                        break;
+                    }     
+                }
+            }
+            
+            selectedNode.removeAllChildren();
+        }
+        else
         if(openingInTable)
         { 
             //System.out.println("test"+tableIndex);
@@ -492,11 +526,8 @@ public class MainForm extends javax.swing.JFrame {
                             {
                                 selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getChildAt(i);
                             }
-                        
-                        
                     }
                     selectedNode.removeAllChildren();
-                   
                 }
                 else
                 {
@@ -527,6 +558,19 @@ public class MainForm extends javax.swing.JFrame {
         //Tree.expandPath(new TreePath(selectedNode.getPath()));
         textAddress.setText((String)selectedNode.getUserObject());
         
+        if(index==-1 || (!saveNode.get(index).equals((String)saveSelectedNode.getUserObject())))
+        {
+            if(!isCreatingNode && !isBacking)
+            {
+                int count=saveNode.size();
+                for(int i=index+1;i<count-1;i++)
+                    saveNode.remove(i);
+                saveNode.add((String)saveSelectedNode.getUserObject());
+                index++;
+            }
+            
+        }
+            
     }//GEN-LAST:event_TreeMouseClicked
 
 
@@ -856,6 +900,14 @@ public class MainForm extends javax.swing.JFrame {
                 if(i>0) strCreateNode=strCreateNode.substring(0,strCreateNode.length()-1);
                 TreeMouseClicked(evt);
             }
+            if(!saveNode.get(index).equals((String)saveSelectedNode.getUserObject()))
+            {
+                for(int i=index+1;i<saveNode.size()-1;i++)
+                    saveNode.remove(i);
+                saveNode.add((String)saveSelectedNode.getUserObject());
+                index++;
+            }
+            
             isCreatingNode=false;
             
         }
@@ -866,10 +918,39 @@ public class MainForm extends javax.swing.JFrame {
                                   "Wrong address",
                                   JOptionPane.WARNING_MESSAGE);
         }
-        //TÁCH CHUỖI
-        //xóa chuỗi ThisPC đầu (nếu có)
-        //vòng for cho treeMouseClick
     }//GEN-LAST:event_btnGotoMouseClicked
+
+    private void btnBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBackMouseClicked
+        // TODO add your handling code here:
+        if(index==-1) 
+            return;
+        if(index==0)
+        {
+            isBacking=true;
+            strBack="ThisPC";
+            TreeMouseClicked(evt);
+            isBacking=false;
+        }
+        isBacking=true;
+        index--;
+        String[] temp=saveNode.get(index).split("\\\\");
+        strBack="";
+        saveSelectedNode=treeRoot;
+        for(int i=0;i<temp.length;i++)
+        {
+            if(i==0) strBack+=temp[i]+"\\";
+            else 
+                if(i==1) strBack+=temp[i];
+                else
+                    strBack+="\\"+temp[i];
+            //if(i>0) strBack=strBack.substring(0,strBack.length()-1);
+            TreeMouseClicked(evt);
+        }        
+        
+        
+                
+        isBacking=false;
+    }//GEN-LAST:event_btnBackMouseClicked
 
     
     void ShowInTable(File[] paths)
