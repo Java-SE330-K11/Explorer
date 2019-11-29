@@ -61,8 +61,10 @@ public class MainForm extends javax.swing.JFrame {
     boolean isGotoAddress=false;
     boolean isCreatingNode=false;
     boolean isBacking=false;
+    boolean isForwarding=false;
     String strCreateNode=null;
     String strBack;
+    String strForward;
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
@@ -179,6 +181,9 @@ public class MainForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
@@ -210,6 +215,11 @@ public class MainForm extends javax.swing.JFrame {
         btnForward.setFocusable(false);
         btnForward.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnForward.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnForward.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnForwardMouseClicked(evt);
+            }
+        });
         jToolBar2.add(btnForward);
         jToolBar2.add(jSeparator1);
 
@@ -475,7 +485,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         
-        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking)
+        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding)
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
@@ -484,6 +494,28 @@ public class MainForm extends javax.swing.JFrame {
         //lấy node được chọn
         DefaultMutableTreeNode selectedNode=null;
 
+        if(isForwarding)
+        {
+            if(strForward.equals("ThisPC")) 
+                selectedNode=treeRoot;
+            else
+            {
+                selectedNode=saveSelectedNode;
+                for(int i=0;i<selectedNode.getChildCount();i++)
+                {
+                    DefaultMutableTreeNode tmp=(DefaultMutableTreeNode)selectedNode.getChildAt(i);
+                    String path=(String)tmp.getUserObject();
+                    if(path.equals(strForward)) 
+                    {
+                        selectedNode=tmp;
+                        break;
+                    }     
+                }
+            }
+            
+            selectedNode.removeAllChildren();
+        }
+        else
         if(isBacking)
         {
             if(strBack.equals("ThisPC")) 
@@ -568,10 +600,10 @@ public class MainForm extends javax.swing.JFrame {
         
         if(index==-1 || (!saveNode.get(index).equals((String)saveSelectedNode.getUserObject())))
         {
-            if(!isCreatingNode && !isBacking)
+            if(!isCreatingNode && !isBacking && !isForwarding)
             {
                 int count=saveNode.size();
-                for(int i=index+1;i<count-1;i++)
+                for(int i=index+1;i<=count-1;i++)
                     saveNode.remove(i);
                 saveNode.add((String)saveSelectedNode.getUserObject());
                 index++;
@@ -956,7 +988,6 @@ public class MainForm extends javax.swing.JFrame {
                 if(i==1) strBack+=temp[i];
                 else
                     strBack+="\\"+temp[i];
-            //if(i>0) strBack=strBack.substring(0,strBack.length()-1);
             TreeMouseClicked(evt);
         }        
         
@@ -1030,6 +1061,32 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_formWindowClosing
+
+    private void btnForwardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnForwardMouseClicked
+        // TODO add your handling code here:
+        if(index+1==saveNode.size()) return;
+        index++;
+        isForwarding=true;
+        String[] temp=saveNode.get(index).split("\\\\");
+        strForward="";
+        saveSelectedNode=treeRoot;
+        for(int i=0;i<temp.length;i++)
+        {
+            if(i==0) strForward+=temp[i]+"\\";
+            else 
+                if(i==1) strForward+=temp[i];
+                else
+                    strForward+="\\"+temp[i];
+            TreeMouseClicked(evt);
+        }     
+        
+        isForwarding=false;
+    }//GEN-LAST:event_btnForwardMouseClicked
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_formWindowClosed
 
     
     void ShowInTable(File[] paths)
