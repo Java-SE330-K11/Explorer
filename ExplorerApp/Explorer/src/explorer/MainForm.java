@@ -179,6 +179,9 @@ public class MainForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -297,6 +300,11 @@ public class MainForm extends javax.swing.JFrame {
         btnDelete.setFocusable(false);
         btnDelete.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnDelete.setMinimumSize(new java.awt.Dimension(70, 40));
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDelete);
 
         btnRefresh.setBackground(new java.awt.Color(255, 255, 255));
@@ -671,6 +679,9 @@ public class MainForm extends javax.swing.JFrame {
                 {
                     saveSelectedNode.add(new DefaultMutableTreeNode(fs[i].getPath()));
                 }
+            DefaultTreeModel model = (DefaultTreeModel)Tree.getModel();
+
+            model.reload(saveSelectedNode);
         }
         catch(Exception ex){
             
@@ -953,6 +964,72 @@ public class MainForm extends javax.swing.JFrame {
                 
         isBacking=false;
     }//GEN-LAST:event_btnBackMouseClicked
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // TODO add your handling code here:
+        int ck=JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa file này?", "Cảnh báo!", JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
+        if (ck==1) return;
+        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent(); 
+        selectedNode.removeAllChildren();
+        saveSelectedNode=selectedNode;
+        String str=(String)selectedNode.getUserObject();
+        java.io.File selectedFile =new File(str);
+        File[] pathfirst=selectedFile.listFiles();
+        int dem=0;
+        int length=pathfirst.length;
+        paths = new File[length];
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory())
+            {
+                 paths[dem]=pathfirst[i];
+                 dem++;
+            }   
+        }
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory()==false)
+            {
+                paths[dem]=pathfirst[i];
+                dem++;
+            }       
+        }
+        
+        
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+        int SelectedRowIndex = Table.getSelectedRow();
+        if(SelectedRowIndex==-1) return;
+        //file
+            File fileDelete = paths[SelectedRowIndex];
+            if(fileDelete.isFile())
+                fileDelete.delete();
+            else
+                try{
+                    FileUtils.deleteDirectory(fileDelete);
+                }
+            catch(Exception e){
+                
+            }             
+         loadTableWhenAction();
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        String stringClipboard = "..\\clipboard";
+        File[] fileLists=new File(stringClipboard).listFiles();
+        for(int i=0;i<fileLists.length;i++)
+        {
+            if(fileLists[i].isFile())
+            fileLists[i].delete();
+            else
+                try{
+                    FileUtils.deleteDirectory(fileLists[i]);
+                }
+            catch(Exception e){
+                
+            }
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     
     void ShowInTable(File[] paths)
