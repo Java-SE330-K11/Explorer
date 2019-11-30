@@ -724,7 +724,40 @@ public class MainForm extends javax.swing.JFrame {
     
     
     private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-
+        if(cut)
+         {
+            String stringClipboard = "..\\clipboard\\"+tmpF;
+            File Clipboard = new File(stringClipboard);
+            System.out.println(Clipboard.toString());
+            System.out.println(fileCoppyPath.toString());
+            if(Clipboard.isFile()){
+                 try{
+                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                    Clipboard.delete();
+            }
+            else if(Clipboard.isDirectory()){
+                 try{
+                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                 try{
+                     FileUtils.deleteDirectory(Clipboard);
+                 }
+                 catch (IOException e)
+                 {
+                   System.out.println("Nope");   
+                 }
+            } 
+             cut = false;
+         }
          //lấy node được chọn
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
@@ -777,6 +810,40 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCutActionPerformed
         // TODO add your handling code here:
+        if(cut)
+         {
+            String stringClipboard = "..\\clipboard\\"+tmpF;
+            File Clipboard = new File(stringClipboard);
+            System.out.println(Clipboard.toString());
+            System.out.println(fileCoppyPath.toString());
+            if(Clipboard.isFile()){
+                 try{
+                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                    Clipboard.delete();
+            }
+            else if(Clipboard.isDirectory()){
+                 try{
+                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                 try{
+                     FileUtils.deleteDirectory(Clipboard);
+                 }
+                 catch (IOException e)
+                 {
+                   System.out.println("Nope");   
+                 }
+            } 
+             cut = false;
+         }
          //lấy node được chọn
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
@@ -1046,20 +1113,40 @@ public class MainForm extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        String stringClipboard = "..\\clipboard";
-        File[] fileLists=new File(stringClipboard).listFiles();
-        for(int i=0;i<fileLists.length;i++)
-        {
-            if(fileLists[i].isFile())
-            fileLists[i].delete();
-            else
-                try{
-                    FileUtils.deleteDirectory(fileLists[i]);
-                }
-            catch(Exception e){
-                
+       if(cut)
+         {
+            String stringClipboard = "..\\clipboard\\"+tmpF;
+            File Clipboard = new File(stringClipboard);
+            System.out.println(Clipboard.toString());
+            System.out.println(fileCoppyPath.toString());
+            if(Clipboard.isFile()){
+                 try{
+                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                    Clipboard.delete();
             }
-        }
+            else if(Clipboard.isDirectory()){
+                 try{
+                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
+                     loadTableWhenAction();
+                    }  
+                 catch (IOException e){
+                         System.out.println("Nope");
+                    }
+                 try{
+                     FileUtils.deleteDirectory(Clipboard);
+                 }
+                 catch (IOException e)
+                 {
+                   System.out.println("Nope");   
+                 }
+            } 
+             cut = false;
+         }
     }//GEN-LAST:event_formWindowClosing
 
     private void btnForwardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnForwardMouseClicked
