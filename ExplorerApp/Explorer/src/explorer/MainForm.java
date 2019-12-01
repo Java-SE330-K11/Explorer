@@ -1321,8 +1321,12 @@ public class MainForm extends javax.swing.JFrame {
             saveSelectedNode=treeRoot;
             for(int i=0;i<temp.length;i++)
             {
-                strCreateNode+=temp[i]+"\\";
-                if(i>0) strCreateNode=strCreateNode.substring(0,strCreateNode.length()-1);
+                if(i==0) strCreateNode+=temp[i]+"\\";
+                else 
+                    if(i==1) strCreateNode+=temp[i];
+                    else
+                        strCreateNode+="\\"+temp[i];
+                
                 TreeMouseClicked(evt);
             }
             if(!saveNode.get(index).equals((String)saveSelectedNode.getUserObject()))
