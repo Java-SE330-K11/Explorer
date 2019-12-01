@@ -63,7 +63,7 @@ public class MainForm extends javax.swing.JFrame {
     //github
     //khoa
     String[] tmpS;
-    String tmpF;
+    String[] tmpF;
     boolean openingInTable=false;
     int tableIndex=-1;
     boolean isUp=false;
@@ -78,6 +78,8 @@ public class MainForm extends javax.swing.JFrame {
     private boolean cut = false;
     private File fileCoppyPath;
     private File filePatsePath;
+    
+    private File[] ArrCoppyFile;
     private ArrayList<String> saveNode = new ArrayList<>();
     int index=-1;
     
@@ -866,7 +868,10 @@ public class MainForm extends javax.swing.JFrame {
     private void btnPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPasteActionPerformed
         // TODO add your handling code here:
          if(copy)
-         {
+         {  
+            for(int k =0; k<ArrCoppyFile.length;k++){
+            fileCoppyPath = ArrCoppyFile[k];
+            System.out.println("cOPPY"+fileCoppyPath.toString());
             String tmpName = new String();
             int fileExist = 1;
             String pasteS = saveSelectedNode.toString();
@@ -877,9 +882,9 @@ public class MainForm extends javax.swing.JFrame {
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
-            tmp+=tmpF;
+            tmp+=tmpF[k];
             tmpE = tmp;
-            System.out.println(tmp);
+            System.out.println(tmp+"tmpS");
             filePatsePath = new File(tmp);
             File fEx = new File(tmpE);
             while(fEx.exists()&&(fileCoppyPath.toString().equals(filePatsePath.toString())==false))
@@ -912,11 +917,14 @@ public class MainForm extends javax.swing.JFrame {
                     }
              }
          }
+         }
          if(cut)
          {
+            for(int k =0; k<ArrCoppyFile.length;k++){
+            fileCoppyPath = ArrCoppyFile[k];
             String tmpName = new String();
             int fileExist = 1;
-            String stringClipboard = "..\\clipboard\\"+tmpF;
+            String stringClipboard = "..\\clipboard\\"+tmpF[k];
             File Clipboard = new File(stringClipboard);
             String pasteS = saveSelectedNode.toString();
             tmpS = pasteS.split("\\\\");
@@ -926,7 +934,7 @@ public class MainForm extends javax.swing.JFrame {
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
-             tmp+=tmpF;
+             tmp+=tmpF[k];
             tmpE = tmp;
             System.out.println(tmp);
             filePatsePath = new File(tmp);
@@ -968,6 +976,7 @@ public class MainForm extends javax.swing.JFrame {
                    System.out.println("Nope");   
                  }
             } 
+            }
              cut = false;
          }
 
@@ -1004,10 +1013,13 @@ public class MainForm extends javax.swing.JFrame {
     private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
         if(cut)
          {
-            String stringClipboard = "..\\clipboard\\"+tmpF;
+            for(int k =0; k<ArrCoppyFile.length;k++){
+            String stringClipboard = "..\\clipboard\\"+tmpF[k];
             File Clipboard = new File(stringClipboard);
+            fileCoppyPath = ArrCoppyFile[k];
             System.out.println(Clipboard.toString());
             System.out.println(fileCoppyPath.toString());
+            
             if(Clipboard.isFile()){
                  try{
                      FileUtils.copyFile(Clipboard, fileCoppyPath); 
@@ -1034,6 +1046,7 @@ public class MainForm extends javax.swing.JFrame {
                    System.out.println("Nope");   
                  }
             } 
+            }
              cut = false;
          }
          //lấy node được chọn
@@ -1066,22 +1079,25 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
-        int SelectedRowIndex = Table.getSelectedRow();
-        
-        fileCoppyPath = paths[SelectedRowIndex];
-        System.out.println(fileCoppyPath.toString());
-         
-        
-        tmpS = fileCoppyPath.toString().split("\\\\");
-        String tmp = new String();
-        for (int i=0;i<tmpS.length-1;i++)
+        int[] SelectedRowIndex = Table.getSelectedRows();
+        ArrCoppyFile = new File[SelectedRowIndex.length];
+        tmpF = new String[SelectedRowIndex.length];
+        for (int i = 0; i < SelectedRowIndex.length; i++)
         {
-            tmp += tmpS[i] + "\\\\" ;
+            fileCoppyPath = paths[SelectedRowIndex[i]];
+            System.out.println(fileCoppyPath.toString());
+            tmpS = fileCoppyPath.toString().split("\\\\");
+            String tmp = new String();
+            for (int j=0;j<tmpS.length-1;j++)
+            {
+                tmp += tmpS[j] + "\\\\" ;
+            }
+            tmpF[i]=tmpS[tmpS.length-1];
+            tmp+=tmpF[i];
+            System.out.println("new file in coppy!!  "+tmp);
+            fileCoppyPath = new File(tmp);
+            ArrCoppyFile[i] = fileCoppyPath ;
         }
-        tmpF=tmpS[tmpS.length-1];
-        tmp+=tmpF;
-        System.out.println(tmp);
-        fileCoppyPath = new File(tmp);
         copy = true;
         cut = false;
     }//GEN-LAST:event_btnCopyActionPerformed
@@ -1090,8 +1106,10 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         if(cut)
          {
-            String stringClipboard = "..\\clipboard\\"+tmpF;
+            for(int k =0; k<ArrCoppyFile.length;k++){
+            String stringClipboard = "..\\clipboard\\"+tmpF[k];
             File Clipboard = new File(stringClipboard);
+            fileCoppyPath = ArrCoppyFile[k];
             System.out.println(Clipboard.toString());
             System.out.println(fileCoppyPath.toString());
             if(Clipboard.isFile()){
@@ -1120,6 +1138,7 @@ public class MainForm extends javax.swing.JFrame {
                    System.out.println("Nope");   
                  }
             } 
+            }
              cut = false;
          }
          //lấy node được chọn
@@ -1155,24 +1174,32 @@ public class MainForm extends javax.swing.JFrame {
         
         
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
-        int SelectedRowIndex = Table.getSelectedRow();
+        
+        
+        //New line 
+        int[] SelectedRowIndex = Table.getSelectedRows();
+        ArrCoppyFile = new File[SelectedRowIndex.length];
+        tmpF = new String[SelectedRowIndex.length];
+        for (int i = 0; i < SelectedRowIndex.length; i++)
+        {
         
         //file
-        fileCoppyPath = paths[SelectedRowIndex];
-          System.out.println(fileCoppyPath.toString());
+        fileCoppyPath = paths[SelectedRowIndex[i]];
+        System.out.println(fileCoppyPath.toString());
          
         
         tmpS = fileCoppyPath.toString().split("\\\\");
         String tmp = new String();
-        for (int i=0;i<tmpS.length-1;i++)
+        for (int j=0;j<tmpS.length-1;j++)
         {
-            tmp += tmpS[i] + "\\\\" ;
+            tmp += tmpS[j] + "\\\\" ;
         }
-        tmpF=tmpS[tmpS.length-1];
-        tmp+=tmpF;
+        tmpF[i]=tmpS[tmpS.length-1];
+        tmp+=tmpF[i];
         System.out.println(tmp);
         fileCoppyPath = new File(tmp);
-        String stringClipboard = "..\\clipboard\\"+tmpF;
+        ArrCoppyFile[i] = fileCoppyPath ;
+        String stringClipboard = "..\\clipboard\\"+tmpF[i];
             File Clipboard = new File(stringClipboard);
         if(fileCoppyPath.isFile())
         {
@@ -1206,7 +1233,7 @@ public class MainForm extends javax.swing.JFrame {
                 //Nope
             }
         }
-        
+        }
         copy = false;
         cut = true;
     }//GEN-LAST:event_btnCutActionPerformed
@@ -1403,7 +1430,9 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
        if(cut)
          {
-            String stringClipboard = "..\\clipboard\\"+tmpF;
+            for(int k =0; k<ArrCoppyFile.length;k++){
+            fileCoppyPath = ArrCoppyFile[k];
+            String stringClipboard = "..\\clipboard\\"+tmpF[k];
             File Clipboard = new File(stringClipboard);
             System.out.println(Clipboard.toString());
             System.out.println(fileCoppyPath.toString());
@@ -1433,6 +1462,7 @@ public class MainForm extends javax.swing.JFrame {
                    System.out.println("Nope");   
                  }
             } 
+            }
              cut = false;
          }
     }//GEN-LAST:event_formWindowClosing
