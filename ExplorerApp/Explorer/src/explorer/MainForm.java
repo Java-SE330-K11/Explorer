@@ -344,6 +344,16 @@ public class MainForm extends javax.swing.JFrame {
         jSplitPane1.setDividerLocation(250);
 
         jScrollPane2.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jScrollPane2MouseClicked(evt);
+            }
+        });
+        jScrollPane2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jScrollPane2KeyPressed(evt);
+            }
+        });
 
         Table.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         Table.setModel(new javax.swing.table.DefaultTableModel(
@@ -364,6 +374,11 @@ public class MainForm extends javax.swing.JFrame {
                 TableMouseClicked(evt);
             }
         });
+        Table.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                TableKeyPressed(evt);
+            }
+        });
         jScrollPane2.setViewportView(Table);
 
         jSplitPane1.setRightComponent(jScrollPane2);
@@ -375,6 +390,11 @@ public class MainForm extends javax.swing.JFrame {
         Tree.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 TreeMouseClicked(evt);
+            }
+        });
+        Tree.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                TreeKeyPressed(evt);
             }
         });
         jScrollPane1.setViewportView(Tree);
@@ -947,6 +967,8 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
         // TODO add your handling code here:
+        System.out.println("I'm in Table");
+        jScrollPane2.requestFocus();
         JTable source = (JTable)evt.getSource();
         int row = source.rowAtPoint( evt.getPoint() );
         int column = source.columnAtPoint( evt.getPoint() );
@@ -1193,15 +1215,34 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_itemSellectAllActionPerformed
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        // TODO add your handling code here:
-//        if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-//                    System.out.println("woot!");
-//                }
-//         if ((evt.getKeyCode() == KeyEvent.VK_A)) {
-//                    System.out.println("woot!");
-//                }
-    JOptionPane.showMessageDialog(null, "Phím bạn vừa bấm là:  " + KeyEvent.getKeyText(evt.getKeyCode()));
+      
+    
     }//GEN-LAST:event_formKeyPressed
+
+    private void TableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TableKeyPressed
+        
+    }//GEN-LAST:event_TableKeyPressed
+
+    private void TreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TreeKeyPressed
+        // TODO add your handling code here:
+        
+                        
+        
+        
+    }//GEN-LAST:event_TreeKeyPressed
+
+    private void jScrollPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseClicked
+        // TODO add your handling code here:
+        jScrollPane2.requestFocus();
+        System.out.println("I'm in croll pane 2");
+    }//GEN-LAST:event_jScrollPane2MouseClicked
+
+    private void jScrollPane2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jScrollPane2KeyPressed
+        // TODO add your handling code here:
+        if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
+                  Table.selectAll();
+        }
+    }//GEN-LAST:event_jScrollPane2KeyPressed
     
     
     void ShowInTable(File[] paths)
