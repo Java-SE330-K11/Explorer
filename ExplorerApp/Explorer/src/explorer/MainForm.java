@@ -867,16 +867,32 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
          if(copy)
          {
+            String tmpName = new String();
+            int fileExist = 1;
             String pasteS = saveSelectedNode.toString();
             tmpS = pasteS.split("\\\\");
             String tmp = new String();
+            String tmpE = new String();
             for (int i=0;i<tmpS.length;i++)
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
             tmp+=tmpF;
+            tmpE = tmp;
             System.out.println(tmp);
             filePatsePath = new File(tmp);
+            File fEx = new File(tmpE);
+            while(fEx.exists()&&(fileCoppyPath.toString().equals(filePatsePath.toString())==false))
+            {
+                System.out.println("in while"+fileCoppyPath.toString());
+                System.out.println(filePatsePath.toString());
+                tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
+                System.out.println("check"+ tmpName);
+                fEx = new File(tmpName);
+                filePatsePath.renameTo(fEx);
+                fileExist +=1;
+            }
+            
              if(fileCoppyPath.isFile()){
                  try{
                      FileUtils.copyFile(fileCoppyPath, filePatsePath); 
@@ -898,19 +914,33 @@ public class MainForm extends javax.swing.JFrame {
          }
          if(cut)
          {
+            String tmpName = new String();
+            int fileExist = 1;
             String stringClipboard = "..\\clipboard\\"+tmpF;
             File Clipboard = new File(stringClipboard);
             String pasteS = saveSelectedNode.toString();
-              tmpS = pasteS.split("\\\\");
+            tmpS = pasteS.split("\\\\");
             String tmp = new String();
+            String tmpE = new String();
             for (int i=0;i<tmpS.length;i++)
             {
                 tmp += tmpS[i] + "\\\\" ;
             }
-            tmp+=tmpF;
+             tmp+=tmpF;
+            tmpE = tmp;
             System.out.println(tmp);
             filePatsePath = new File(tmp);
-            System.out.println(filePatsePath.toString());
+            File fEx = new File(tmpE);
+            while(fEx.exists()&&(fileCoppyPath.toString().equals(filePatsePath.toString())==false))
+            {
+                System.out.println("in while"+fileCoppyPath.toString());
+                System.out.println(filePatsePath.toString());
+                tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
+                System.out.println("check"+ tmpName);
+                fEx = new File(tmpName);
+                filePatsePath.renameTo(fEx);
+                fileExist +=1;
+            }
             System.out.println(Clipboard.toString());
             if(Clipboard.isFile()){
                  try{
@@ -1039,7 +1069,7 @@ public class MainForm extends javax.swing.JFrame {
         int SelectedRowIndex = Table.getSelectedRow();
         
         fileCoppyPath = paths[SelectedRowIndex];
-          System.out.println(fileCoppyPath.toString());
+        System.out.println(fileCoppyPath.toString());
          
         
         tmpS = fileCoppyPath.toString().split("\\\\");
