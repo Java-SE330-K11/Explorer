@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.List;
 import java.awt.datatransfer.Clipboard;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,7 +47,13 @@ import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 /**
  *
  * @author User
@@ -74,6 +81,8 @@ public class MainForm extends javax.swing.JFrame {
     private ArrayList<String> saveNode = new ArrayList<>();
     int index=-1;
     
+    private boolean isRenameClick=false;
+    private boolean isTaoMoiThuMuc=false;
     private File[] paths;
     private DefaultMutableTreeNode saveSelectedNode=null;
     private DefaultMutableTreeNode treeRoot=null;
@@ -106,19 +115,18 @@ public class MainForm extends javax.swing.JFrame {
         }
     }
     class Render extends DefaultTableCellRenderer{
-            Map<Integer,Icon> icons;
-            Map<Integer,String> str;
-            public Render(Map<Integer,Icon> icons,Map<Integer,String> str) { 
-                this.icons=icons;
-                this.str=str;
+            public Render() { 
+            
             }
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
             {
                 super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
+                String path=(String)table.getModel().getValueAt(row, column);
+                String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
                 this.setOpaque(true);
-                this.setIcon(icons.get(row));
-                this.setText(str.get(row));
+                this.setIcon(FileSystemView.getFileSystemView().getSystemIcon(new File(selectedFilePath)));
+                this.setText(path);
                 this.setBackground(Color.WHITE);
                 if (isSelected)
                 {
@@ -131,6 +139,185 @@ public class MainForm extends javax.swing.JFrame {
                 return this;
             }
     }
+    class CustomEditor extends DefaultCellEditor{
+
+        public CustomEditor(JTextField textField) {
+            super(textField);
+        }
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            
+            JTextField editor = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
+
+            if(column!=0) return null;
+            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false)) return null;       
+            
+            if (value != null)
+                {
+                    editor.setText(value.toString());
+                }
+            if(value==null)
+                {
+                    System.out.println("nullllll");
+                    editor.setText("nothing");
+                }
+            
+            return editor;
+        }
+    }
+    public class TableCellListener implements PropertyChangeListener, Runnable
+    {
+	private JTable table;
+        private JTree tree;
+	private Action action;
+
+	private int row;
+	private int column;
+	private Object oldValue;
+	private Object newValue;
+
+	public TableCellListener(JTable table, JTree tree)
+	{
+		this.table = table;
+		this.tree = tree;
+		this.table.addPropertyChangeListener( this );
+	}
+
+	
+	private TableCellListener(JTable table, int row, int column, Object oldValue, Object newValue)
+	{
+		this.table = table;
+		this.row = row;
+		this.column = column;
+		this.oldValue = oldValue;
+		this.newValue = newValue;
+	}
+
+	/**
+	 *  Get the column that was last edited
+	 *
+	 *  @return the column that was edited
+	 */
+	public int getColumn()
+	{
+		return column;
+	}
+
+	/**
+	 *  Get the new value in the cell
+	 *
+	 *  @return the new value in the cell
+	 */
+	public Object getNewValue()
+	{
+		return newValue;
+	}
+
+	/**
+	 *  Get the old value of the cell
+	 *
+	 *  @return the old value of the cell
+	 */
+	public Object getOldValue()
+	{
+		return oldValue;
+	}
+
+	/**
+	 *  Get the row that was last edited
+	 *
+	 *  @return the row that was edited
+	 */
+	public int getRow()
+	{
+		return row;
+	}
+
+	/**
+	 *  Get the table of the cell that was changed
+	 *
+	 *  @return the table of the cell that was changed
+	 */
+	public JTable getTable()
+	{
+		return table;
+	}
+//
+//  Implement the PropertyChangeListener interface
+//
+	@Override
+	public void propertyChange(PropertyChangeEvent e)
+	{
+		//  A cell has started/stopped editing
+
+		if ("tableCellEditor".equals(e.getPropertyName()))
+		{
+			if (table.isEditing())
+				processEditingStarted();
+			else
+				processEditingStopped();
+		}
+	}
+
+	/*
+	 *  Save information of the cell about to be edited
+	 */
+	private void processEditingStarted()
+	{
+		//  The invokeLater is necessary because the editing row and editing
+		//  column of the table have not been set when the "tableCellEditor"
+		//  PropertyChangeEvent is fired.
+		//  This results in the "run" method being invoked
+
+		SwingUtilities.invokeLater( this );
+	}
+	/*
+	 *  See above.
+	 */
+	@Override
+	public void run()
+	{
+		row = table.convertRowIndexToModel( table.getEditingRow() );
+		column = table.convertColumnIndexToModel( table.getEditingColumn() );
+		oldValue = table.getModel().getValueAt(row, column);
+		newValue = null;
+	}
+
+	/*
+	 *	Update the Cell history when necessary
+	 */
+	private void processEditingStopped()
+	{
+		newValue = table.getModel().getValueAt(row, column);
+
+		//  The data has changed, invoke the supplied Action
+
+		if (! newValue.equals(oldValue))
+		{
+			//  Make a copy of the data in case another cell starts editing
+			//  while processing this change
+
+			TableCellListener tcl = new TableCellListener(
+				getTable(), getRow(), getColumn(), getOldValue(), getNewValue());
+
+			ActionEvent event = new ActionEvent(
+				tcl,
+				ActionEvent.ACTION_PERFORMED,
+				"");
+			//action.actionPerformed(event);
+                        //JOptionPane.showMessageDialog(null, "đã edit");
+                        //System.out.println("giá trị cũ "+oldValue+" ,giá trị mới: "+newValue);
+                        String fileOld=saveSelectedNode.toString()+"\\"+oldValue;
+                        String fileNew=saveSelectedNode.toString()+"\\"+newValue;
+                        File fO=new File(fileOld);
+                        File fN=new File(fileNew);
+                        fO.renameTo(fN);
+                        loadTableWhenAction();
+		}
+                isRenameClick=false;
+                isTaoMoiThuMuc=false;
+	}
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -330,6 +517,11 @@ public class MainForm extends javax.swing.JFrame {
         btnRefresh.setFocusable(false);
         btnRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnRefresh.setMinimumSize(new java.awt.Dimension(70, 40));
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnRefresh);
 
         btnView.setBackground(new java.awt.Color(255, 255, 255));
@@ -434,20 +626,43 @@ public class MainForm extends javax.swing.JFrame {
 
         itemFolder.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemFolder.setText("Folder");
+        itemFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemFolderActionPerformed(evt);
+            }
+        });
         itemNew.add(itemFolder);
 
         File.add(itemNew);
 
+        itemRename.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
         itemRename.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        itemRename.setText("Rename        F2");
+        itemRename.setLabel("Rename");
+        itemRename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemRenameActionPerformed(evt);
+            }
+        });
         File.add(itemRename);
 
+        itemDelete.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0));
         itemDelete.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        itemDelete.setText("Delete          Del");
+        itemDelete.setLabel("Delete");
+        itemDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemDeleteActionPerformed(evt);
+            }
+        });
         File.add(itemDelete);
 
+        itemExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         itemExit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        itemExit.setText("Exit           Alt+F4");
+        itemExit.setLabel("Exit");
+        itemExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemExitActionPerformed(evt);
+            }
+        });
         File.add(itemExit);
 
         jMenuBar1.add(File);
@@ -512,6 +727,7 @@ public class MainForm extends javax.swing.JFrame {
         
         loadTree();
         loadTable();
+        TableCellListener tcl=new TableCellListener(Table,Tree);
     }//GEN-LAST:event_formWindowOpened
 
 
@@ -970,32 +1186,40 @@ public class MainForm extends javax.swing.JFrame {
         System.out.println("I'm in Table");
         jScrollPane2.requestFocus();
         JTable source = (JTable)evt.getSource();
-        int row = source.rowAtPoint( evt.getPoint() );
-        int column = source.columnAtPoint( evt.getPoint() );
-        File s=(File)source.getModel().getValueAt(row, column);
-        //System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
         if (evt.getClickCount() == 2 && source.getSelectedRow() != -1)
         {
-            
+            int row = source.rowAtPoint( evt.getPoint() );
+            int column = source.columnAtPoint( evt.getPoint() );
+            String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, column);
+            File s=new File(str);
+            //System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
+            //System.out.println("Table clicked");
             Desktop desktop = Desktop.getDesktop();
             try{
                 if(s.exists() && s.isFile()) desktop.open(s);
                 else
                 {
                     DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
-                    //File[] paths=s.listFiles();
+                    paths=s.listFiles();
+                    //System.out.println("fucksss : "+s.getAbsolutePath());
                     openingInTable=true;
                     tableIndex=row;
+                    //System.out.println("Ban chon dong: "+tableIndex);
                   
                     TreeMouseClicked(evt);
-                    
+                    //System.out.println("ddmmm cmmm");
+                    //System.out.println("Path length :"+paths.length);
                     //ShowInTable(paths);
                 }
             }
                     
             catch(Exception ex)
             {
-                
+                //System.out.println("Loi o day nay : "+ex.getMessage());
+                //System.out.println("Table cos: "+Table.getRowCount());
+                //for(File a:paths)
+                    //System.out.println(a.getAbsolutePath());
+                //ShowInTable(paths);
             }
         }
     }//GEN-LAST:event_TableMouseClicked
@@ -1243,14 +1467,74 @@ public class MainForm extends javax.swing.JFrame {
                   Table.selectAll();
         }
     }//GEN-LAST:event_jScrollPane2KeyPressed
+
+    private void itemFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFolderActionPerformed
+        // TODO add your handling code here:
+        if(saveSelectedNode==null)return;
+        int dem=1;
+        String str="New folder";
+        
+        DefaultTableModel model=(DefaultTableModel) Table.getModel();
+        
+        String path=saveSelectedNode.toString();
+        
+        while(new File(path+"\\"+str+"("+dem+")").exists()){
+            dem++;
+        };
+        
+        path=path+"\\"+str+"("+dem+")";
+        File newFolder=new File(path);
+        
+        try{
+            newFolder.mkdir();
+        }
+        catch(Exception ex){
+            
+        }
+        
+        loadTableWhenAction();
+        
+        
+        String abc=newFolder.getName();
+        for(int i=0;i<Table.getRowCount();i++)
+        {
+            String temp=(String)Table.getValueAt(i, 0);
+            if(temp.equals(abc))
+            {
+                Table.setRowSelectionInterval(i, i);
+                isTaoMoiThuMuc=true;
+                Table.editCellAt(i, 0);
+                return;
+            }   
+        }    
+    }//GEN-LAST:event_itemFolderActionPerformed
+
+    private void itemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemExitActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_itemExitActionPerformed
+
+    private void itemRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRenameActionPerformed
+        // TODO add your handling code here:
+        isRenameClick=true; 
+        int rowSua=Table.getSelectedRow();
+        Table.editCellAt(rowSua, 0);
+    }//GEN-LAST:event_itemRenameActionPerformed
+
+    private void itemDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemDeleteActionPerformed
+        // TODO add your handling code here:
+        btnDeleteActionPerformed(evt);
+    }//GEN-LAST:event_itemDeleteActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        // TODO add your handling code here:
+        loadTableWhenAction();
+    }//GEN-LAST:event_btnRefreshActionPerformed
     
     
     void ShowInTable(File[] paths)
     {
         int dem=0;
-        Map<Integer,Icon> icons=new HashMap<Integer,Icon>();
-        Map<Integer,String> str=new HashMap<Integer,String>();
-        //Table.re
         int n=paths.length;
         Object row[]=new Object[4];
 
@@ -1264,12 +1548,7 @@ public class MainForm extends javax.swing.JFrame {
         for(int i=0;i<n;i++)
             if(paths[i].isDirectory())
             {
-                row[0]=paths[i];
-                Icon ic=FileSystemView.getFileSystemView().getSystemIcon(paths[i]);                
-                icons.put(dem, FileSystemView.getFileSystemView().getSystemIcon(paths[i]));
-                str.put(dem,paths[i].getName());
-                dem++;                
-                //row[0]=paths[i].getName();
+                row[0]=paths[i].getName();              
                 Date d = new Date(paths[i].lastModified());
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                 String strDate = formatter.format(d);
@@ -1281,12 +1560,7 @@ public class MainForm extends javax.swing.JFrame {
         for(int i=0;i<n;i++)
             if(paths[i].isFile())
             {
-                row[0]=paths[i];
-                //row[0]=paths[i].getName();
-                Icon ic=FileSystemView.getFileSystemView().getSystemIcon(paths[i]);
-                icons.put(dem, FileSystemView.getFileSystemView().getSystemIcon(paths[i]));
-                str.put(dem,paths[i].getName());
-                dem++;
+                row[0]=paths[i].getName();
                 Date d = new Date(paths[i].lastModified());
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                 String strDate = formatter.format(d);
@@ -1296,7 +1570,7 @@ public class MainForm extends javax.swing.JFrame {
                 tableModel.addRow(row);
             }
         
-        Table.getColumnModel().getColumn(0).setCellRenderer(new Render(icons,str));
+        Table.getColumnModel().getColumn(0).setCellRenderer(new Render());
     }
     
     private void loadTree()
@@ -1321,7 +1595,7 @@ public class MainForm extends javax.swing.JFrame {
     private void loadTable()
     {
         Table.setBackground(Color.WHITE);
-        Table.setDefaultEditor(Object.class, null);
+        Table.setDefaultEditor(Object.class, new CustomEditor(new JTextField()));
         JTableHeader header = Table.getTableHeader();
         header.setPreferredSize(new Dimension(100, 30));
         header.setFont(new Font("",Font.PLAIN,18));
