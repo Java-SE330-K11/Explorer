@@ -45,6 +45,8 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.awt.event.KeyEvent;
+import javax.swing.JFrame;
 /**
  *
  * @author User
@@ -189,6 +191,11 @@ public class MainForm extends javax.swing.JFrame {
             }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
+            }
+        });
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
             }
         });
 
@@ -439,6 +446,11 @@ public class MainForm extends javax.swing.JFrame {
         Edit.add(jSeparator3);
 
         itemSellectAll.setText("Sellect All       Ctrl+A");
+        itemSellectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemSellectAllActionPerformed(evt);
+            }
+        });
         Edit.add(itemSellectAll);
 
         jMenuBar1.add(Edit);
@@ -1175,6 +1187,22 @@ public class MainForm extends javax.swing.JFrame {
         
     }//GEN-LAST:event_formWindowClosed
 
+    private void itemSellectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSellectAllActionPerformed
+        // TODO add your handling code here:
+        Table.selectAll();
+    }//GEN-LAST:event_itemSellectAllActionPerformed
+
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+        // TODO add your handling code here:
+//        if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
+//                    System.out.println("woot!");
+//                }
+//         if ((evt.getKeyCode() == KeyEvent.VK_A)) {
+//                    System.out.println("woot!");
+//                }
+    JOptionPane.showMessageDialog(null, "Phím bạn vừa bấm là:  " + KeyEvent.getKeyText(evt.getKeyCode()));
+    }//GEN-LAST:event_formKeyPressed
+    
     
     void ShowInTable(File[] paths)
     {
