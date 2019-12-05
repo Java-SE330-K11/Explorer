@@ -1009,9 +1009,8 @@ public class MainForm extends javax.swing.JFrame {
         ShowInTable(paths);
     }
     
-    
-    private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-        if(cut)
+    private void CoppyAction(){
+         if(cut)
          {
             for(int k =0; k<ArrCoppyFile.length;k++){
             String stringClipboard = "..\\clipboard\\"+tmpF[k];
@@ -1100,6 +1099,10 @@ public class MainForm extends javax.swing.JFrame {
         }
         copy = true;
         cut = false;
+    }
+    
+    private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
+        CoppyAction();
     }//GEN-LAST:event_btnCopyActionPerformed
 
     private void btnCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCutActionPerformed
@@ -1384,8 +1387,8 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        int ck=JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa file này?", "Cảnh báo!", JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
-        if (ck==1) return;
+        
+        
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent(); 
         selectedNode.removeAllChildren();
         saveSelectedNode=selectedNode;
@@ -1413,21 +1416,57 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         
-        DefaultTableModel model = (DefaultTableModel) Table.getModel();
-        int SelectedRowIndex = Table.getSelectedRow();
-        if(SelectedRowIndex==-1) return;
+       DefaultTableModel model = (DefaultTableModel) Table.getModel();
+        
+        
+        //New line 
+        int[] SelectedRowIndex = Table.getSelectedRows();
+        ArrCoppyFile = new File[SelectedRowIndex.length];
+        tmpF = new String[SelectedRowIndex.length];
+        if(SelectedRowIndex.length!=0)
+        {
+            int ck=JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa file này?", "Cảnh báo!", JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
+            if (ck==1) return;
+        }
+        for (int i = 0; i < SelectedRowIndex.length; i++)
+        {
+        
         //file
-            File fileDelete = paths[SelectedRowIndex];
-            if(fileDelete.isFile())
-                fileDelete.delete();
-            else
-                try{
-                    FileUtils.deleteDirectory(fileDelete);
-                }
-            catch(Exception e){
-                
-            }             
-         loadTableWhenAction();
+        fileCoppyPath = paths[SelectedRowIndex[i]];
+        System.out.println(fileCoppyPath.toString());
+         
+        
+        tmpS = fileCoppyPath.toString().split("\\\\");
+        String tmp = new String();
+        for (int j=0;j<tmpS.length-1;j++)
+        {
+            tmp += tmpS[j] + "\\\\" ;
+        }
+        tmpF[i]=tmpS[tmpS.length-1];
+        tmp+=tmpF[i];
+        System.out.println(tmp);
+        fileCoppyPath = new File(tmp);
+        ArrCoppyFile[i] = fileCoppyPath ;
+        if(fileCoppyPath.isFile())
+        {
+
+          
+            fileCoppyPath.delete();
+            loadTableWhenAction();
+        }
+        else if(fileCoppyPath.isDirectory())
+        {
+
+             try{
+                 FileUtils.deleteDirectory(fileCoppyPath);
+                 loadTableWhenAction();
+            }
+            catch (IOException e)
+            {
+                //Nope
+            }
+        }
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -1529,6 +1568,9 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
                   Table.selectAll();
+        }
+        if ((evt.getKeyCode() == KeyEvent.VK_C)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
+                  CoppyAction();
         }
     }//GEN-LAST:event_jScrollPane2KeyPressed
 
