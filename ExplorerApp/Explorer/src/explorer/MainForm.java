@@ -54,6 +54,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import java.awt.color.*;
 /**
  *
  * @author User
@@ -673,12 +674,27 @@ public class MainForm extends javax.swing.JFrame {
         Edit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         itemCopy.setText("Copy               Ctrl+C");
+        itemCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCopyActionPerformed(evt);
+            }
+        });
         Edit.add(itemCopy);
 
         itemCut.setText("Cut                  Ctrl+X");
+        itemCut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCutActionPerformed(evt);
+            }
+        });
         Edit.add(itemCut);
 
         itemPaste.setText("Paste               Ctrl+V");
+        itemPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemPasteActionPerformed(evt);
+            }
+        });
         Edit.add(itemPaste);
         Edit.add(jSeparator3);
 
@@ -863,10 +879,8 @@ public class MainForm extends javax.swing.JFrame {
             
     }//GEN-LAST:event_TreeMouseClicked
 
-
-    
-    private void btnPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPasteActionPerformed
-        // TODO add your handling code here:
+    private void pasteAction()
+    {
          if(copy)
          {  
             for(int k =0; k<ArrCoppyFile.length;k++){
@@ -979,7 +993,12 @@ public class MainForm extends javax.swing.JFrame {
             }
              cut = false;
          }
-
+    checkChoose();
+    }
+    
+    private void btnPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPasteActionPerformed
+        // TODO add your handling code here:
+        pasteAction();
     }//GEN-LAST:event_btnPasteActionPerformed
 
     private void loadTableWhenAction()
@@ -1099,14 +1118,16 @@ public class MainForm extends javax.swing.JFrame {
         }
         copy = true;
         cut = false;
+        checkChoose();
     }
     
     private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-        CoppyAction();
+
+        CoppyAction(); 
     }//GEN-LAST:event_btnCopyActionPerformed
 
-    private void btnCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCutActionPerformed
-        // TODO add your handling code here:
+    private void cutAction()
+    {
         if(cut)
          {
             for(int k =0; k<ArrCoppyFile.length;k++){
@@ -1144,6 +1165,7 @@ public class MainForm extends javax.swing.JFrame {
             }
              cut = false;
          }
+        
          //lấy node được chọn
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
@@ -1239,6 +1261,13 @@ public class MainForm extends javax.swing.JFrame {
         }
         copy = false;
         cut = true;
+        checkChoose();
+    }
+    
+    
+    private void btnCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCutActionPerformed
+        // TODO add your handling code here:
+        cutAction();
     }//GEN-LAST:event_btnCutActionPerformed
 
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
@@ -1553,11 +1582,26 @@ public class MainForm extends javax.swing.JFrame {
     private void TreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TreeKeyPressed
         // TODO add your handling code here:
         
-                        
-        
-        
     }//GEN-LAST:event_TreeKeyPressed
 
+    private void checkChoose()
+    {
+        if(copy)
+        {
+            btnCopy.setForeground(Color.BLUE);
+        }
+        if(cut)
+        {
+            btnCut.setForeground(Color.BLUE);
+        }
+        if(!copy) {
+             btnCopy.setForeground(Color.BLACK);
+        }
+         if(!cut) {
+             btnCut.setForeground(Color.BLACK);
+        }
+    }
+    
     private void jScrollPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseClicked
         // TODO add your handling code here:
         jScrollPane2.requestFocus();
@@ -1572,6 +1616,13 @@ public class MainForm extends javax.swing.JFrame {
         if ((evt.getKeyCode() == KeyEvent.VK_C)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
                   CoppyAction();
         }
+        if ((evt.getKeyCode() == KeyEvent.VK_X)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
+                  cutAction();
+        }
+         if ((evt.getKeyCode() == KeyEvent.VK_V)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
+                  pasteAction();
+        }
+        
     }//GEN-LAST:event_jScrollPane2KeyPressed
 
     private void itemFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFolderActionPerformed
@@ -1636,6 +1687,21 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         loadTableWhenAction();
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void itemCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCopyActionPerformed
+        // TODO add your handling code here:
+        CoppyAction();
+    }//GEN-LAST:event_itemCopyActionPerformed
+
+    private void itemCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCutActionPerformed
+        // TODO add your handling code here:
+        cutAction();
+    }//GEN-LAST:event_itemCutActionPerformed
+
+    private void itemPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemPasteActionPerformed
+        // TODO add your handling code here:
+        pasteAction();
+    }//GEN-LAST:event_itemPasteActionPerformed
     
     
     void ShowInTable(File[] paths)
