@@ -86,6 +86,7 @@ public class MainForm extends javax.swing.JFrame {
     
     private boolean isRenameClick=false;
     private boolean isTaoMoiThuMuc=false;
+    private boolean isTaoMoiFile=false;
     private File[] paths;
     private DefaultMutableTreeNode saveSelectedNode=null;
     private DefaultMutableTreeNode treeRoot=null;
@@ -153,7 +154,7 @@ public class MainForm extends javax.swing.JFrame {
             JTextField editor = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
 
             if(column!=0) return null;
-            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false)) return null;       
+            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false && isTaoMoiFile==false)) return null;       
             
             if (value != null)
                 {
@@ -319,6 +320,7 @@ public class MainForm extends javax.swing.JFrame {
 		}
                 isRenameClick=false;
                 isTaoMoiThuMuc=false;
+                isTaoMoiFile=false;
 	}
 }
 
@@ -357,6 +359,7 @@ public class MainForm extends javax.swing.JFrame {
         File = new javax.swing.JMenu();
         itemNew = new javax.swing.JMenu();
         itemFolder = new javax.swing.JMenuItem();
+        itemFile = new javax.swing.JMenuItem();
         itemRename = new javax.swing.JMenuItem();
         itemDelete = new javax.swing.JMenuItem();
         itemExit = new javax.swing.JMenuItem();
@@ -635,6 +638,15 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         itemNew.add(itemFolder);
+
+        itemFile.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        itemFile.setText("File");
+        itemFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemFileActionPerformed(evt);
+            }
+        });
+        itemNew.add(itemFile);
 
         File.add(itemNew);
 
@@ -1627,7 +1639,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void itemFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFolderActionPerformed
         // TODO add your handling code here:
-        if(saveSelectedNode==null)return;
+        if(saveSelectedNode.toString().equals("ThisPC"))return;
         int dem=1;
         String str="New folder";
         
@@ -1702,6 +1714,52 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         pasteAction();
     }//GEN-LAST:event_itemPasteActionPerformed
+
+    private void itemFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFileActionPerformed
+        // TODO add your handling code here:
+        
+        if(saveSelectedNode.toString().equals("ThisPC"))return;
+        int dem=1;
+        String str="New File";
+        DefaultTableModel model=(DefaultTableModel) Table.getModel();
+        
+        String path=saveSelectedNode.toString();
+        System.out.println("Haahahhaah "+path);
+        
+        while(new File(path+"\\"+str+"("+dem+")").exists()){
+            dem++;
+        };
+        
+        path=path+"\\"+str+"("+dem+")";
+        File xx=new File(path);
+        
+        try{
+            xx.createNewFile();
+        }
+        catch(Exception ex){
+            
+        }
+        loadTableWhenAction();
+        
+        
+        String abc=xx.getName();
+        System.out.println("abc :"+abc);
+        for(int i=0;i<Table.getRowCount();i++)
+            //System.out.println((String)Table.getValueAt(i, 0));
+        {
+            String temp=(String)Table.getValueAt(i, 0);
+            if(temp.equals(abc))
+            {
+                Table.setRowSelectionInterval(i, i);
+                isTaoMoiFile=true;
+                Table.editCellAt(i, 0);
+                return;
+            }   
+        }
+        
+        
+        
+    }//GEN-LAST:event_itemFileActionPerformed
     
     
     void ShowInTable(File[] paths)
@@ -1845,6 +1903,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemCut;
     private javax.swing.JMenuItem itemDelete;
     private javax.swing.JMenuItem itemExit;
+    private javax.swing.JMenuItem itemFile;
     private javax.swing.JMenuItem itemFolder;
     private javax.swing.JMenu itemNew;
     private javax.swing.JMenuItem itemPaste;
