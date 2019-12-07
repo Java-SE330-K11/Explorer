@@ -913,20 +913,27 @@ public class MainForm extends javax.swing.JFrame {
             System.out.println(tmp+"tmpS");
             filePatsePath = new File(tmp);
             File fEx = new File(tmpE);
-            while(fEx.exists()&&(fileCoppyPath.toString().equals(filePatsePath.toString())==false))
+            while(fEx.exists()&&fEx.isFile())
             {
                 System.out.println("in while"+fileCoppyPath.toString());
                 System.out.println(filePatsePath.toString());
                 tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
                 System.out.println("check"+ tmpName);
                 fEx = new File(tmpName);
-                filePatsePath.renameTo(fEx);
                 fileExist +=1;
             }
-            
+             while(fEx.exists()&&fEx.isDirectory())
+            {
+                System.out.println("in while"+fileCoppyPath.toString());
+                System.out.println(filePatsePath.toString());
+                tmpName = tmp.split("\\.")[0] + "("+fileExist+")";
+                System.out.println("check"+ tmpName);
+                fEx = new File(tmpName);
+                fileExist +=1;
+            }
              if(fileCoppyPath.isFile()){
                  try{
-                     FileUtils.copyFile(fileCoppyPath, filePatsePath); 
+                     FileUtils.copyFile(fileCoppyPath, fEx); 
                      loadTableWhenAction();
                     }  
                  catch (IOException e){
@@ -935,13 +942,14 @@ public class MainForm extends javax.swing.JFrame {
              }
              else if(fileCoppyPath.isDirectory()){
                  try{
-                     FileUtils.copyDirectory(fileCoppyPath, filePatsePath); 
+                     FileUtils.copyDirectory(fileCoppyPath, fEx); 
                      loadTableWhenAction();
                     }  
                  catch (IOException e){
                          System.out.println("Nope");
                     }
              }
+            
          }
          }
          if(cut)
@@ -965,20 +973,28 @@ public class MainForm extends javax.swing.JFrame {
             System.out.println(tmp);
             filePatsePath = new File(tmp);
             File fEx = new File(tmpE);
-            while(fEx.exists()&&(fileCoppyPath.toString().equals(filePatsePath.toString())==false))
+            while(fEx.exists()&&fEx.isFile())
             {
                 System.out.println("in while"+fileCoppyPath.toString());
                 System.out.println(filePatsePath.toString());
                 tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
                 System.out.println("check"+ tmpName);
                 fEx = new File(tmpName);
-                filePatsePath.renameTo(fEx);
+                fileExist +=1;
+            }
+             while(fEx.exists()&&fEx.isDirectory())
+            {
+                System.out.println("in while"+fileCoppyPath.toString());
+                System.out.println(filePatsePath.toString());
+                tmpName = tmp.split("\\.")[0] + "("+fileExist+")";
+                System.out.println("check"+ tmpName);
+                fEx = new File(tmpName);
                 fileExist +=1;
             }
             System.out.println(Clipboard.toString());
             if(Clipboard.isFile()){
                  try{
-                     FileUtils.copyFile(Clipboard, filePatsePath); 
+                     FileUtils.copyFile(Clipboard, fEx); 
                      loadTableWhenAction();
                     }  
                  catch (IOException e){
@@ -988,7 +1004,7 @@ public class MainForm extends javax.swing.JFrame {
             }
             else if(Clipboard.isDirectory()){
                  try{
-                     FileUtils.copyDirectory(Clipboard, filePatsePath); 
+                     FileUtils.copyDirectory(Clipboard, fEx); 
                      loadTableWhenAction();
                     }  
                  catch (IOException e){
