@@ -92,7 +92,7 @@ public class MainForm extends javax.swing.JFrame {
     private DefaultMutableTreeNode treeRoot=null;
     public MainForm() {
         initComponents();
-        //Tree.setCellRenderer(new TreeNodeRender());
+        Tree.setCellRenderer(new TreeNodeRender());
     }
     class TreeNodeRender extends DefaultTreeCellRenderer{
         private JLabel label;
@@ -105,15 +105,32 @@ public class MainForm extends javax.swing.JFrame {
             super.getTreeCellRendererComponent(tree, value, leaf, expanded, leaf, row, hasFocus);
             Object o = ((DefaultMutableTreeNode) value).getUserObject();
             JLabel label=new JLabel();
+            
+            File[] mypaths=java.io.File.listRoots();
+            String oC="..\\icons\\IconData.ico";
+            String oK="..\\icons\\IconData1.ico";
+            ImageIcon imgC=new ImageIcon(oC);
+            ImageIcon imgK=new ImageIcon(oK);
+                
             if (o instanceof String) {
                 String str = (String) o;
-                Icon ic=FileSystemView.getFileSystemView().getSystemIcon(new File(str));
-                label.setIcon(ic);                   
+                                   
                 if(str.length()==3)
-                        label.setText(str);
+                {
+                    label.setText(str);
+                    if(str.equals(mypaths[0].getAbsolutePath()))
+                    label.setIcon(imgC);
                     else
-                        label.setText(new File(str).getName());
-                label.setIcon(ic);                   
+                        label.setIcon(imgK);
+                }
+                        
+                    else
+                {
+                    Icon ic=FileSystemView.getFileSystemView().getSystemIcon(new File(str));
+                    label.setText(new File(str).getName());
+                    label.setIcon(ic);
+                }
+                                          
                 }
             return label;
         }
