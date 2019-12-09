@@ -126,9 +126,9 @@ public class MainForm extends javax.swing.JFrame {
                         
                     else
                 {
-                    Icon ic=FileSystemView.getFileSystemView().getSystemIcon(new File(str));
                     label.setText(new File(str).getName());
-                    label.setIcon(ic);
+                    if(!str.equals("ThisPC"))
+                    label.setIcon(new ImageIcon("..\\icons\\IconData3.ico"));
                 }
                                           
                 }
