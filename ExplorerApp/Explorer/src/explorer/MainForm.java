@@ -107,8 +107,8 @@ public class MainForm extends javax.swing.JFrame {
             JLabel label=new JLabel();
             
             File[] mypaths=java.io.File.listRoots();
-            String oC="..\\icons\\IconData.ico";
-            String oK="..\\icons\\IconData1.ico";
+            String oC="..\\icons\\oC.png";
+            String oK="..\\icons\\oK.png";
             ImageIcon imgC=new ImageIcon(oC);
             ImageIcon imgK=new ImageIcon(oK);
                 
@@ -128,7 +128,11 @@ public class MainForm extends javax.swing.JFrame {
                 {
                     label.setText(new File(str).getName());
                     if(!str.equals("ThisPC"))
-                    label.setIcon(new ImageIcon("..\\icons\\IconData3.ico"));
+                    //label.setIcon(new ImageIcon("..\\icons\\ThisPC.ico"));
+                    //else
+                        label.setIcon(new ImageIcon("..\\icons\\folder.png"));
+                    else
+                        label.setIcon(new ImageIcon("..\\icons\\ico16.png"));
                 }
                                           
                 }
@@ -1324,7 +1328,7 @@ public class MainForm extends javax.swing.JFrame {
         {
             int row = source.rowAtPoint( evt.getPoint() );
             int column = source.columnAtPoint( evt.getPoint() );
-            String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, column);
+            String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
             File s=new File(str);
             //System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
             //System.out.println("Table clicked");
