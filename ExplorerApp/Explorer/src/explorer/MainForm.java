@@ -10,8 +10,11 @@ import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.List;
+import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -55,6 +58,10 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import java.awt.color.*;
+import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 /**
  *
  * @author User
@@ -68,6 +75,7 @@ public class MainForm extends javax.swing.JFrame {
     boolean openingInTable=false;
     int tableIndex=-1;
     boolean isUp=false;
+    boolean isOpen=false;
     boolean isGotoAddress=false;
     boolean isCreatingNode=false;
     boolean isBacking=false;
@@ -90,9 +98,13 @@ public class MainForm extends javax.swing.JFrame {
     private File[] paths;
     private DefaultMutableTreeNode saveSelectedNode=null;
     private DefaultMutableTreeNode treeRoot=null;
+    
     public MainForm() {
         initComponents();
         Tree.setCellRenderer(new TreeNodeRender());
+        
+        SetUpPopupMenus();
+        jScrollPane2.getViewport().setBackground(Color.WHITE);
     }
     class TreeNodeRender extends DefaultTreeCellRenderer{
         private JLabel label;
@@ -371,6 +383,24 @@ public class MainForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem6 = new javax.swing.JMenuItem();
+        popupMenuPanel = new javax.swing.JPopupMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
+        jSeparator8 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem8 = new javax.swing.JMenuItem();
+        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem9 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jToolBar2 = new javax.swing.JToolBar();
         btnBack = new javax.swing.JButton();
@@ -409,6 +439,117 @@ public class MainForm extends javax.swing.JFrame {
         itemSellectAll = new javax.swing.JMenuItem();
         Help = new javax.swing.JMenu();
         itemAbout = new javax.swing.JMenuItem();
+
+        popupMenu.setOpaque(false);
+        popupMenu.setPreferredSize(new java.awt.Dimension(200, 200));
+
+        jMenuItem1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem1.setText("Open");
+        jMenuItem1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenuItem1MouseClicked(evt);
+            }
+        });
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem1);
+        popupMenu.add(jSeparator5);
+
+        jMenuItem2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem2.setText("Copy");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem2);
+
+        jMenuItem3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem3.setText("Cut");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem3);
+        popupMenu.add(jSeparator6);
+
+        jMenuItem4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem4.setText("Delete");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem4);
+
+        jMenuItem5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem5.setText("Rename");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem5);
+        popupMenu.add(jSeparator7);
+
+        jMenuItem6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem6.setText("Select All");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        popupMenu.add(jMenuItem6);
+
+        popupMenuPanel.setPreferredSize(new java.awt.Dimension(160, 130));
+
+        jMenuItem7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem7.setText("jMenuItem7");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        popupMenuPanel.add(jMenuItem7);
+        popupMenuPanel.add(jSeparator8);
+
+        jMenuItem8.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem8.setText("jMenuItem8");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        popupMenuPanel.add(jMenuItem8);
+        popupMenuPanel.add(jSeparator9);
+
+        jMenu1.setText("New..");
+        jMenu1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        jMenuItem9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem9.setText("jMenuItem9");
+        jMenuItem9.setPreferredSize(new java.awt.Dimension(130, 25));
+        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem9ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem9);
+
+        jMenuItem10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem10.setText("jMenuItem10");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem10);
+
+        popupMenuPanel.add(jMenu1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -589,6 +730,9 @@ public class MainForm extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jScrollPane2MouseClicked(evt);
             }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jScrollPane2MouseReleased(evt);
+            }
         });
         jScrollPane2.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -613,6 +757,9 @@ public class MainForm extends javax.swing.JFrame {
         Table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 TableMouseClicked(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                TableMouseReleased(evt);
             }
         });
         Table.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -1358,17 +1505,20 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
         // TODO add your handling code here:
+        
         System.out.println("I'm in Table");
         jScrollPane2.requestFocus();
         JTable source = (JTable)evt.getSource();
-        if (evt.getClickCount() == 2 && source.getSelectedRow() != -1)
+        if ((evt.getClickCount() == 2 || isOpen) && source.getSelectedRow() != -1)
         {
+            
+            isOpen=false;
+            System.out.println("is orpn");
             int row = source.rowAtPoint( evt.getPoint() );
             int column = source.columnAtPoint( evt.getPoint() );
+            
             String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
             File s=new File(str);
-            //System.out.println("pathfile dang chon o table :"+s.getAbsolutePath());
-            //System.out.println("Table clicked");
             Desktop desktop = Desktop.getDesktop();
             try{
                 if(s.exists() && s.isFile()) desktop.open(s);
@@ -1376,25 +1526,15 @@ public class MainForm extends javax.swing.JFrame {
                 {
                     DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
                     paths=s.listFiles();
-                    //System.out.println("fucksss : "+s.getAbsolutePath());
                     openingInTable=true;
                     tableIndex=row;
-                    //System.out.println("Ban chon dong: "+tableIndex);
                   
                     TreeMouseClicked(evt);
-                    //System.out.println("ddmmm cmmm");
-                    //System.out.println("Path length :"+paths.length);
-                    //ShowInTable(paths);
                 }
             }
                     
             catch(Exception ex)
             {
-                //System.out.println("Loi o day nay : "+ex.getMessage());
-                //System.out.println("Table cos: "+Table.getRowCount());
-                //for(File a:paths)
-                    //System.out.println(a.getAbsolutePath());
-                //ShowInTable(paths);
             }
         }
     }//GEN-LAST:event_TableMouseClicked
@@ -1700,8 +1840,8 @@ public class MainForm extends javax.swing.JFrame {
     
     private void jScrollPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseClicked
         // TODO add your handling code here:
-        jScrollPane2.requestFocus();
-        System.out.println("I'm in croll pane 2");
+        Table.clearSelection();
+
     }//GEN-LAST:event_jScrollPane2MouseClicked
 
     private void jScrollPane2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jScrollPane2KeyPressed
@@ -1849,6 +1989,126 @@ public class MainForm extends javax.swing.JFrame {
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnBackActionPerformed
+
+    
+    
+    private void TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseReleased
+        if(saveSelectedNode==null || saveSelectedNode.toString().equals("ThisPC")) 
+            return;
+        if(evt.isPopupTrigger())
+        {
+            setEnableItems();
+            if(Table.getSelectedRowCount()>0)
+            {
+                popupMenu.show(this, 0, 0);
+                popupMenu.setLocation(MouseInfo.getPointerInfo().getLocation());
+            }
+            else
+            {
+                popupMenuPanel.show(this, 0, 0);
+                popupMenuPanel.setLocation(MouseInfo.getPointerInfo().getLocation());
+            }
+            
+        }
+    }//GEN-LAST:event_TableMouseReleased
+
+    private void jScrollPane2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseReleased
+        // TODO add your handling code here:
+        if(saveSelectedNode==null || saveSelectedNode.toString().equals("ThisPC")) 
+            return;
+        jScrollPane2.requestFocus();
+        System.out.println("I'm in croll pane 2");
+        if(evt.isPopupTrigger())
+        {
+            setEnableItems();
+            Table.clearSelection();
+            popupMenuPanel.show(this, 0, 0);
+            popupMenuPanel.setLocation(MouseInfo.getPointerInfo().getLocation());
+        }
+    }//GEN-LAST:event_jScrollPane2MouseReleased
+
+    private void SetUpPopupMenus()
+    {
+        jMenuItem2.setText("Copy             Ctrl+C");
+        jMenuItem3.setText("Cut                Ctrl+X");
+        jMenuItem4.setText("Delete");
+        jMenuItem5.setText("Rename         F2");
+        jMenuItem6.setText("Select All        Ctrl+A");
+        
+        jMenuItem7.setText("Refresh");
+        jMenuItem8.setText("Paste");
+        jMenuItem9.setText("Folder");
+        jMenuItem10.setText("File");
+    }
+    
+    private void setEnableItems()
+    {
+        if(Table.getSelectedRowCount()>1) jMenuItem1.setEnabled(false);
+        else jMenuItem1.setEnabled(true);
+        if(Table.getSelectedRowCount()>0) jMenuItem4.setEnabled(true);
+        else jMenuItem4.setEnabled(false);
+        if(Table.getSelectedRowCount()>1) jMenuItem5.setEnabled(false);
+        else jMenuItem5.setEnabled(true);
+        
+        if(copy || cut) jMenuItem8.setEnabled(true);
+        else jMenuItem8.setEnabled(false);
+        
+        
+    }
+    
+    private void jMenuItem1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem1MouseClicked
+
+    }//GEN-LAST:event_jMenuItem1MouseClicked
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        btnCopyActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        btnCutActionPerformed(evt);
+        
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        btnDeleteActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        // TODO add your handling code here:
+        itemRenameActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        itemSellectAllActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        btnRefreshActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+        btnPasteActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
+
+    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+        // TODO add your handling code here:
+        itemFolderActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        // TODO add your handling code here:
+        itemFileActionPerformed(evt);
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
     
     
     void ShowInTable(File[] paths,DefaultMutableTreeNode selectedNode)
@@ -2006,7 +2266,18 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemPaste;
     private javax.swing.JMenuItem itemRename;
     private javax.swing.JMenuItem itemSellectAll;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -2014,10 +2285,17 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
+    private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JLabel lbAddress;
+    private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JPopupMenu popupMenuPanel;
     private javax.swing.JTextField textAddress;
     // End of variables declaration//GEN-END:variables
 
