@@ -149,8 +149,25 @@ public class MainForm extends javax.swing.JFrame {
                 super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
                 String path=(String)table.getModel().getValueAt(row, column);
                 String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
+                
+                
                 this.setOpaque(true);
+                File []fp=java.io.File.listRoots();
+                for(File f : fp){
+                    if(f.getAbsolutePath().equals(path))
+                        selectedFilePath=path;
+                }
                 this.setIcon(FileSystemView.getFileSystemView().getSystemIcon(new File(selectedFilePath)));
+                if(saveSelectedNode.toString().equals("ThisPC"))
+                {
+                    if(selectedFilePath.equals(fp[0].getAbsolutePath()))
+                    this.setIcon(new ImageIcon("..\\icons\\oC.png"));
+                    else
+                        this.setIcon(new ImageIcon("..\\icons\\oK.png"));
+                    
+                }
+                    
+                
                 this.setText(path);
                 this.setBackground(Color.WHITE);
                 if (isSelected)
@@ -370,7 +387,6 @@ public class MainForm extends javax.swing.JFrame {
         btnPaste = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
-        btnView = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         Table = new javax.swing.JTable();
@@ -383,6 +399,7 @@ public class MainForm extends javax.swing.JFrame {
         itemFile = new javax.swing.JMenuItem();
         itemRename = new javax.swing.JMenuItem();
         itemDelete = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
         itemExit = new javax.swing.JMenuItem();
         Edit = new javax.swing.JMenu();
         itemCopy = new javax.swing.JMenuItem();
@@ -390,7 +407,6 @@ public class MainForm extends javax.swing.JFrame {
         itemPaste = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         itemSellectAll = new javax.swing.JMenuItem();
-        View = new javax.swing.JMenu();
         Help = new javax.swing.JMenu();
         itemAbout = new javax.swing.JMenuItem();
 
@@ -421,6 +437,7 @@ public class MainForm extends javax.swing.JFrame {
 
         btnBack.setBackground(new java.awt.Color(255, 255, 255));
         btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/back.png"))); // NOI18N
+        btnBack.setToolTipText("Back");
         btnBack.setFocusable(false);
         btnBack.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnBack.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -429,10 +446,16 @@ public class MainForm extends javax.swing.JFrame {
                 btnBackMouseClicked(evt);
             }
         });
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnBack);
 
         btnForward.setBackground(new java.awt.Color(255, 255, 255));
         btnForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/forward.png"))); // NOI18N
+        btnForward.setToolTipText("Forward");
         btnForward.setFocusable(false);
         btnForward.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnForward.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -446,6 +469,7 @@ public class MainForm extends javax.swing.JFrame {
 
         btnUp.setBackground(new java.awt.Color(255, 255, 255));
         btnUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/up.png"))); // NOI18N
+        btnUp.setToolTipText("Up");
         btnUp.setFocusable(false);
         btnUp.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnUp.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -470,6 +494,7 @@ public class MainForm extends javax.swing.JFrame {
         btnGoto.setBackground(new java.awt.Color(255, 255, 255));
         btnGoto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/goto.png"))); // NOI18N
         btnGoto.setText("Go to");
+        btnGoto.setToolTipText("Go to address");
         btnGoto.setFocusable(false);
         btnGoto.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnGoto.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -486,6 +511,7 @@ public class MainForm extends javax.swing.JFrame {
         btnCopy.setBackground(new java.awt.Color(255, 255, 255));
         btnCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/copy.png"))); // NOI18N
         btnCopy.setText("Copy");
+        btnCopy.setToolTipText("Copy");
         btnCopy.setFocusable(false);
         btnCopy.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnCopy.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
@@ -500,6 +526,7 @@ public class MainForm extends javax.swing.JFrame {
         btnCut.setBackground(new java.awt.Color(255, 255, 255));
         btnCut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/cut.png"))); // NOI18N
         btnCut.setText("Cut");
+        btnCut.setToolTipText("Cut");
         btnCut.setFocusable(false);
         btnCut.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnCut.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
@@ -514,6 +541,7 @@ public class MainForm extends javax.swing.JFrame {
         btnPaste.setBackground(new java.awt.Color(255, 255, 255));
         btnPaste.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/paste.png"))); // NOI18N
         btnPaste.setText("Paste");
+        btnPaste.setToolTipText("Paste");
         btnPaste.setFocusable(false);
         btnPaste.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnPaste.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
@@ -528,6 +556,7 @@ public class MainForm extends javax.swing.JFrame {
         btnDelete.setBackground(new java.awt.Color(255, 255, 255));
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/delete.png"))); // NOI18N
         btnDelete.setText("Delete");
+        btnDelete.setToolTipText("Delete");
         btnDelete.setFocusable(false);
         btnDelete.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnDelete.setMinimumSize(new java.awt.Dimension(70, 40));
@@ -541,6 +570,7 @@ public class MainForm extends javax.swing.JFrame {
         btnRefresh.setBackground(new java.awt.Color(255, 255, 255));
         btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/refresh.png"))); // NOI18N
         btnRefresh.setText("Refresh");
+        btnRefresh.setToolTipText("Reload data");
         btnRefresh.setFocusable(false);
         btnRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnRefresh.setMinimumSize(new java.awt.Dimension(70, 40));
@@ -550,14 +580,6 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnRefresh);
-
-        btnView.setBackground(new java.awt.Color(255, 255, 255));
-        btnView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/view.png"))); // NOI18N
-        btnView.setText("View");
-        btnView.setFocusable(false);
-        btnView.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        btnView.setMinimumSize(new java.awt.Dimension(70, 40));
-        jToolBar1.add(btnView);
 
         jSplitPane1.setBackground(new java.awt.Color(255, 255, 255));
         jSplitPane1.setDividerLocation(250);
@@ -653,6 +675,7 @@ public class MainForm extends javax.swing.JFrame {
 
         itemFolder.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemFolder.setText("Folder");
+        itemFolder.setToolTipText("New Folder");
         itemFolder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemFolderActionPerformed(evt);
@@ -662,6 +685,7 @@ public class MainForm extends javax.swing.JFrame {
 
         itemFile.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemFile.setText("File");
+        itemFile.setToolTipText("New File");
         itemFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemFileActionPerformed(evt);
@@ -673,6 +697,7 @@ public class MainForm extends javax.swing.JFrame {
 
         itemRename.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
         itemRename.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        itemRename.setToolTipText("Rename");
         itemRename.setLabel("Rename");
         itemRename.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -683,6 +708,7 @@ public class MainForm extends javax.swing.JFrame {
 
         itemDelete.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0));
         itemDelete.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        itemDelete.setToolTipText("Delete");
         itemDelete.setLabel("Delete");
         itemDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -690,9 +716,11 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         File.add(itemDelete);
+        File.add(jSeparator4);
 
         itemExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         itemExit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        itemExit.setToolTipText("Close ");
         itemExit.setLabel("Exit");
         itemExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -706,7 +734,9 @@ public class MainForm extends javax.swing.JFrame {
         Edit.setText("Edit");
         Edit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
+        itemCopy.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemCopy.setText("Copy               Ctrl+C");
+        itemCopy.setToolTipText("Copy");
         itemCopy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemCopyActionPerformed(evt);
@@ -714,7 +744,9 @@ public class MainForm extends javax.swing.JFrame {
         });
         Edit.add(itemCopy);
 
+        itemCut.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemCut.setText("Cut                  Ctrl+X");
+        itemCut.setToolTipText("Cut");
         itemCut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemCutActionPerformed(evt);
@@ -722,7 +754,9 @@ public class MainForm extends javax.swing.JFrame {
         });
         Edit.add(itemCut);
 
+        itemPaste.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemPaste.setText("Paste               Ctrl+V");
+        itemPaste.setToolTipText("Paste");
         itemPaste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemPasteActionPerformed(evt);
@@ -731,7 +765,9 @@ public class MainForm extends javax.swing.JFrame {
         Edit.add(itemPaste);
         Edit.add(jSeparator3);
 
+        itemSellectAll.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemSellectAll.setText("Sellect All       Ctrl+A");
+        itemSellectAll.setToolTipText("Sellect All");
         itemSellectAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemSellectAllActionPerformed(evt);
@@ -741,14 +777,11 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenuBar1.add(Edit);
 
-        View.setText("View");
-        View.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jMenuBar1.add(View);
-
         Help.setText("Help");
         Help.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         itemAbout.setText("About us");
+        itemAbout.setToolTipText("More information");
         itemAbout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemAboutActionPerformed(evt);
@@ -784,6 +817,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         
+        if(Tree.getLastSelectedPathComponent()==null) return;
         if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding)
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
@@ -887,8 +921,9 @@ public class MainForm extends javax.swing.JFrame {
             {
                 selectedNode.add(new DefaultMutableTreeNode(path.getAbsolutePath()));
             }
-        ShowInTable(pathss);
         saveSelectedNode=selectedNode;
+        ShowInTable(pathss,selectedNode);
+        
         DefaultTreeModel model=(DefaultTreeModel)Tree.getModel();
         model.reload(selectedNode);
         
@@ -909,7 +944,9 @@ public class MainForm extends javax.swing.JFrame {
             }
             
         }
-            
+        
+        if(saveSelectedNode.toString().equals("ThisPC")) itemRename.setEnabled(false);
+        else itemRename.setEnabled(true);
     }//GEN-LAST:event_TreeMouseClicked
 
     private void pasteAction()
@@ -1074,7 +1111,7 @@ public class MainForm extends javax.swing.JFrame {
             
         }
         
-        ShowInTable(paths);
+        ShowInTable(paths,saveSelectedNode);
     }
     
     private void CoppyAction(){
@@ -1365,6 +1402,7 @@ public class MainForm extends javax.swing.JFrame {
     private void itemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAboutActionPerformed
         // TODO add your handling code here:
         AboutForm aboutForm=new AboutForm();
+        aboutForm.setLocation(this.getLocation());
         aboutForm.setVisible(true);
     }//GEN-LAST:event_itemAboutActionPerformed
 
@@ -1432,35 +1470,44 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBackMouseClicked
         // TODO add your handling code here:
-        if(index==-1) 
-            return;
-        if(index==0)
+        try
         {
-            index--;
+            if(index==-1) 
+            return;
+            if(index==0)
+            {
+                index--;
+                isBacking=true;
+                strBack="ThisPC";
+                TreeMouseClicked(evt);
+                isBacking=false;
+                return;
+            }
             isBacking=true;
-            strBack="ThisPC";
-            TreeMouseClicked(evt);
+            index--;
+            String[] temp=saveNode.get(index).split("\\\\");
+            strBack="";
+            saveSelectedNode=treeRoot;
+            for(int i=0;i<temp.length;i++)
+            {
+                if(i==0) strBack+=temp[i]+"\\";
+                else 
+                    if(i==1) strBack+=temp[i];
+                    else
+                        strBack+="\\"+temp[i];
+                TreeMouseClicked(evt);
+            }        
+
+
+
             isBacking=false;
-            return;
         }
-        isBacking=true;
-        index--;
-        String[] temp=saveNode.get(index).split("\\\\");
-        strBack="";
-        saveSelectedNode=treeRoot;
-        for(int i=0;i<temp.length;i++)
+        catch (Exception e)
         {
-            if(i==0) strBack+=temp[i]+"\\";
-            else 
-                if(i==1) strBack+=temp[i];
-                else
-                    strBack+="\\"+temp[i];
-            TreeMouseClicked(evt);
-        }        
+            
+        }
         
         
-                
-        isBacking=false;
     }//GEN-LAST:event_btnBackMouseClicked
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -1722,6 +1769,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void itemRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRenameActionPerformed
         // TODO add your handling code here:
+        
         isRenameClick=true; 
         int rowSua=Table.getSelectedRow();
         Table.editCellAt(rowSua, 0);
@@ -1797,9 +1845,13 @@ public class MainForm extends javax.swing.JFrame {
         
         
     }//GEN-LAST:event_itemFileActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
     
     
-    void ShowInTable(File[] paths)
+    void ShowInTable(File[] paths,DefaultMutableTreeNode selectedNode)
     {
         int dem=0;
         int n=paths.length;
@@ -1812,16 +1864,23 @@ public class MainForm extends javax.swing.JFrame {
             tableModel.removeRow(0);
         }
         
-        for(int i=0;i<n;i++)
+
+        
+            for(int i=0;i<n;i++)
             if(paths[i].isDirectory())
             {
+                if(paths[i].getAbsolutePath().length()!=3)
                 row[0]=paths[i].getName();              
+                else
+                    row[0]=paths[i].getAbsolutePath();
                 Date d = new Date(paths[i].lastModified());
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                 String strDate = formatter.format(d);
                 row[1]=strDate;
                 row[2]="Folder";
+                if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
                 row[3]="N/A";
+                if(selectedNode.toString().equals("ThisPC")) row[3]="loading...";
                 tableModel.addRow(row);
             }
         for(int i=0;i<n;i++)
@@ -1833,9 +1892,12 @@ public class MainForm extends javax.swing.JFrame {
                 String strDate = formatter.format(d);
                 row[1]=strDate;
                 row[2]="File";
+                if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
                 row[3]=paths[i].length()/1000+" KB";
                 tableModel.addRow(row);
             }
+        
+        
         
         Table.getColumnModel().getColumn(0).setCellRenderer(new Render());
     }
@@ -1924,7 +1986,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu Help;
     private javax.swing.JTable Table;
     private javax.swing.JTree Tree;
-    private javax.swing.JMenu View;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCopy;
     private javax.swing.JButton btnCut;
@@ -1934,7 +1995,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnPaste;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUp;
-    private javax.swing.JButton btnView;
     private javax.swing.JMenuItem itemAbout;
     private javax.swing.JMenuItem itemCopy;
     private javax.swing.JMenuItem itemCut;
@@ -1953,6 +2013,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;

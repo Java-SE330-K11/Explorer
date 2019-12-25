@@ -32,6 +32,7 @@
                       <Font name="Segoe UI" size="18" style="0"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Folder"/>
+                    <Property name="toolTipText" type="java.lang.String" value="New Folder"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemFolderActionPerformed"/>
@@ -43,6 +44,7 @@
                       <Font name="Segoe UI" size="18" style="0"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="File"/>
+                    <Property name="toolTipText" type="java.lang.String" value="New File"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemFileActionPerformed"/>
@@ -58,6 +60,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="0"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Rename"/>
                 <Property name="label" type="java.lang.String" value="Rename"/>
               </Properties>
               <Events>
@@ -72,11 +75,14 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="0"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Delete"/>
                 <Property name="label" type="java.lang.String" value="Delete"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemDeleteActionPerformed"/>
               </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="itemExit">
               <Properties>
@@ -86,6 +92,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="0"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Close "/>
                 <Property name="label" type="java.lang.String" value="Exit"/>
               </Properties>
               <Events>
@@ -104,7 +111,11 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="itemCopy">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Segoe UI" size="18" style="0"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Copy               Ctrl+C"/>
+                <Property name="toolTipText" type="java.lang.String" value="Copy"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemCopyActionPerformed"/>
@@ -112,7 +123,11 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="itemCut">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Segoe UI" size="18" style="0"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Cut                  Ctrl+X"/>
+                <Property name="toolTipText" type="java.lang.String" value="Cut"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemCutActionPerformed"/>
@@ -120,7 +135,11 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="itemPaste">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Segoe UI" size="18" style="0"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Paste               Ctrl+V"/>
+                <Property name="toolTipText" type="java.lang.String" value="Paste"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemPasteActionPerformed"/>
@@ -130,21 +149,17 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="itemSellectAll">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Segoe UI" size="18" style="0"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Sellect All       Ctrl+A"/>
+                <Property name="toolTipText" type="java.lang.String" value="Sellect All"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemSellectAllActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="View">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="View"/>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Segoe UI" size="18" style="0"/>
-            </Property>
-          </Properties>
         </Menu>
         <Menu class="javax.swing.JMenu" name="Help">
           <Properties>
@@ -157,6 +172,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="itemAbout">
               <Properties>
                 <Property name="text" type="java.lang.String" value="About us"/>
+                <Property name="toolTipText" type="java.lang.String" value="More information"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemAboutActionPerformed"/>
@@ -262,12 +278,14 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/explorer/image/back.png"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Back"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnBackMouseClicked"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBackActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnForward">
@@ -278,6 +296,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/explorer/image/forward.png"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Forward"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
@@ -296,6 +315,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/explorer/image/up.png"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Up"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
@@ -339,6 +359,7 @@
                   <Image iconType="3" name="/explorer/image/goto.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Go to"/>
+                <Property name="toolTipText" type="java.lang.String" value="Go to address"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
               </Properties>
@@ -368,6 +389,7 @@
                   <Image iconType="3" name="/explorer/image/copy.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Copy"/>
+                <Property name="toolTipText" type="java.lang.String" value="Copy"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalAlignment" type="int" value="2"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
@@ -388,6 +410,7 @@
                   <Image iconType="3" name="/explorer/image/cut.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Cut"/>
+                <Property name="toolTipText" type="java.lang.String" value="Cut"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalAlignment" type="int" value="2"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
@@ -408,6 +431,7 @@
                   <Image iconType="3" name="/explorer/image/paste.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Paste"/>
+                <Property name="toolTipText" type="java.lang.String" value="Paste"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalAlignment" type="int" value="2"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
@@ -428,6 +452,7 @@
                   <Image iconType="3" name="/explorer/image/delete.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Delete"/>
+                <Property name="toolTipText" type="java.lang.String" value="Delete"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -447,6 +472,7 @@
                   <Image iconType="3" name="/explorer/image/refresh.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Refresh"/>
+                <Property name="toolTipText" type="java.lang.String" value="Reload data"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -456,22 +482,6 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshActionPerformed"/>
               </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="btnView">
-              <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/explorer/image/view.png"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="View"/>
-                <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
-                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 40]"/>
-                </Property>
-              </Properties>
             </Component>
           </SubComponents>
         </Container>

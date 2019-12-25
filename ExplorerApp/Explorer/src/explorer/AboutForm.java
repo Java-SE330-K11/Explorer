@@ -19,6 +19,7 @@ public class AboutForm extends javax.swing.JFrame {
      */
     public AboutForm() {
         initComponents();
+        
     }
 
     /**
