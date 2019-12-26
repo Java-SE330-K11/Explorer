@@ -80,6 +80,7 @@ public class MainForm extends javax.swing.JFrame {
     boolean isCreatingNode=false;
     boolean isBacking=false;
     boolean isForwarding=false;
+    boolean isSelectAll=false;
     String strCreateNode=null;
     String strBack;
     String strForward;
@@ -384,8 +385,6 @@ public class MainForm extends javax.swing.JFrame {
     private void initComponents() {
 
         popupMenu = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
@@ -442,21 +441,6 @@ public class MainForm extends javax.swing.JFrame {
 
         popupMenu.setOpaque(false);
         popupMenu.setPreferredSize(new java.awt.Dimension(200, 200));
-
-        jMenuItem1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jMenuItem1.setText("Open");
-        jMenuItem1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuItem1MouseClicked(evt);
-            }
-        });
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        popupMenu.add(jMenuItem1);
-        popupMenu.add(jSeparator5);
 
         jMenuItem2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jMenuItem2.setText("Copy");
@@ -1803,7 +1787,17 @@ public class MainForm extends javax.swing.JFrame {
 
     private void itemSellectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSellectAllActionPerformed
         // TODO add your handling code here:
-        Table.selectAll();
+        if(!isSelectAll)
+        {
+            isSelectAll=true;
+            Table.selectAll();
+        }
+        else
+        {
+            Table.clearSelection();
+            isSelectAll=false;
+        }
+        
     }//GEN-LAST:event_itemSellectAllActionPerformed
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
@@ -1812,7 +1806,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_formKeyPressed
 
     private void TableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TableKeyPressed
-        
+
     }//GEN-LAST:event_TableKeyPressed
 
     private void TreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TreeKeyPressed
@@ -1847,7 +1841,16 @@ public class MainForm extends javax.swing.JFrame {
     private void jScrollPane2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jScrollPane2KeyPressed
         // TODO add your handling code here:
         if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-                  Table.selectAll();
+                  if(!isSelectAll)
+                    {
+                        isSelectAll=true;
+                        Table.selectAll();
+                    }
+                    else
+                    {
+                        Table.clearSelection();
+                        isSelectAll=false;
+                    }
         }
         if ((evt.getKeyCode() == KeyEvent.VK_C)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
                   CoppyAction();
@@ -2043,8 +2046,6 @@ public class MainForm extends javax.swing.JFrame {
     
     private void setEnableItems()
     {
-        if(Table.getSelectedRowCount()>1) jMenuItem1.setEnabled(false);
-        else jMenuItem1.setEnabled(true);
         if(Table.getSelectedRowCount()>0) jMenuItem4.setEnabled(true);
         else jMenuItem4.setEnabled(false);
         if(Table.getSelectedRowCount()>1) jMenuItem5.setEnabled(false);
@@ -2056,14 +2057,6 @@ public class MainForm extends javax.swing.JFrame {
         
     }
     
-    private void jMenuItem1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem1MouseClicked
-
-    }//GEN-LAST:event_jMenuItem1MouseClicked
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
         btnCopyActionPerformed(evt);
@@ -2268,7 +2261,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemSellectAll;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
@@ -2285,7 +2277,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JPopupMenu.Separator jSeparator8;
