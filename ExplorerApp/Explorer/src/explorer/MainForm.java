@@ -10,58 +10,32 @@ import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.List;
 import java.awt.MouseInfo;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import javax.swing.DefaultListModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import org.apache.commons.io.FileUtils;
-import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import java.awt.color.*;
-import java.awt.event.MouseEvent;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 /**
  *
  * @author User
@@ -107,53 +81,8 @@ public class MainForm extends javax.swing.JFrame {
         SetUpPopupMenus();
         jScrollPane2.getViewport().setBackground(Color.WHITE);
     }
-    class TreeNodeRender extends DefaultTreeCellRenderer{
-        private JLabel label;
-
-        TreeNodeRender() {
-            label = new JLabel();
-        }
-
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            super.getTreeCellRendererComponent(tree, value, leaf, expanded, leaf, row, hasFocus);
-            Object o = ((DefaultMutableTreeNode) value).getUserObject();
-            JLabel label=new JLabel();
-            
-            File[] mypaths=java.io.File.listRoots();
-            String oC="..\\icons\\oC.png";
-            String oK="..\\icons\\oK.png";
-            ImageIcon imgC=new ImageIcon(oC);
-            ImageIcon imgK=new ImageIcon(oK);
-                
-            if (o instanceof String) {
-                String str = (String) o;
-                                   
-                if(str.length()==3)
-                {
-                    label.setText(str);
-                    if(str.equals(mypaths[0].getAbsolutePath()))
-                    label.setIcon(imgC);
-                    else
-                        label.setIcon(imgK);
-                }
-                        
-                    else
-                {
-                    label.setText(new File(str).getName());
-                    if(!str.equals("ThisPC"))
-                    //label.setIcon(new ImageIcon("..\\icons\\ThisPC.ico"));
-                    //else
-                        label.setIcon(new ImageIcon("..\\icons\\folder.png"));
-                    else
-                        label.setIcon(new ImageIcon("..\\icons\\ico16.png"));
-                }
-                                          
-                }
-            return label;
-        }
-    }
-    class Render extends DefaultTableCellRenderer{
-            public Render() { 
+    class TableRender extends DefaultTableCellRenderer{
+            public TableRender() { 
             
             }
             @Override
@@ -205,18 +134,15 @@ public class MainForm extends javax.swing.JFrame {
             JTextField editor = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
 
             if(column!=0) return null;
-            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false && isTaoMoiFile==false)) return null;       
-            
+            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false && isTaoMoiFile==false)) return null;
             if (value != null)
                 {
                     editor.setText(value.toString());
                 }
             if(value==null)
                 {
-                    System.out.println("nullllll");
                     editor.setText("nothing");
-                }
-            
+                }   
             return editor;
         }
     }
@@ -359,9 +285,6 @@ public class MainForm extends javax.swing.JFrame {
 				tcl,
 				ActionEvent.ACTION_PERFORMED,
 				"");
-			//action.actionPerformed(event);
-                        //JOptionPane.showMessageDialog(null, "đã edit");
-                        //System.out.println("giá trị cũ "+oldValue+" ,giá trị mới: "+newValue);
                         String fileOld=saveSelectedNode.toString()+"\\"+oldValue;
                         String fileNew=saveSelectedNode.toString()+"\\"+newValue;
                         File fO=new File(fileOld);
@@ -939,7 +862,6 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        
         loadTree();
         loadTable();
         TableCellListener tcl=new TableCellListener(Table,Tree);
@@ -947,7 +869,6 @@ public class MainForm extends javax.swing.JFrame {
 
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
-        
         if(Tree.getLastSelectedPathComponent()==null) return;
         if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding)
         {
@@ -1222,8 +1143,6 @@ public class MainForm extends javax.swing.JFrame {
     {
         String str=(String)saveSelectedNode.getUserObject();
         java.io.File selectedFile =new File(str);
-        //System.out.println(str);
-        //java.io.File selectedFile =(java.io.File)saveSelectedNode.getUserObject();
         java.io.File[] paths=selectedFile.listFiles();
         
         try{
@@ -1339,7 +1258,6 @@ public class MainForm extends javax.swing.JFrame {
     }
     
     private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-
         CoppyAction(); 
     }//GEN-LAST:event_btnCopyActionPerformed
 
@@ -1489,15 +1407,11 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
         // TODO add your handling code here:
-        
-        System.out.println("I'm in Table");
         jScrollPane2.requestFocus();
         JTable source = (JTable)evt.getSource();
         if ((evt.getClickCount() == 2 || isOpen) && source.getSelectedRow() != -1)
         {
-            
             isOpen=false;
-            System.out.println("is orpn");
             int row = source.rowAtPoint( evt.getPoint() );
             int column = source.columnAtPoint( evt.getPoint() );
             
@@ -1512,7 +1426,6 @@ public class MainForm extends javax.swing.JFrame {
                     paths=s.listFiles();
                     openingInTable=true;
                     tableIndex=row;
-                  
                     TreeMouseClicked(evt);
                 }
             }
@@ -1636,8 +1549,6 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        
-        
         DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent(); 
         selectedNode.removeAllChildren();
         saveSelectedNode=selectedNode;
@@ -1952,7 +1863,6 @@ public class MainForm extends javax.swing.JFrame {
         DefaultTableModel model=(DefaultTableModel) Table.getModel();
         
         String path=saveSelectedNode.toString();
-        System.out.println("Haahahhaah "+path);
         
         while(new File(path+"\\"+str+"("+dem+")").exists()){
             dem++;
@@ -1971,9 +1881,7 @@ public class MainForm extends javax.swing.JFrame {
         
         
         String abc=xx.getName();
-        System.out.println("abc :"+abc);
         for(int i=0;i<Table.getRowCount();i++)
-            //System.out.println((String)Table.getValueAt(i, 0));
         {
             String temp=(String)Table.getValueAt(i, 0);
             if(temp.equals(abc))
@@ -2152,7 +2060,7 @@ public class MainForm extends javax.swing.JFrame {
         
         
         
-        Table.getColumnModel().getColumn(0).setCellRenderer(new Render());
+        Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
     }
     
     private void loadTree()
@@ -2167,7 +2075,6 @@ public class MainForm extends javax.swing.JFrame {
         {
             String pathStr=path.getAbsolutePath();
             ThisPC.add(new DefaultMutableTreeNode(pathStr));
-            //ThisPC.add(new DefaultMutableTreeNode(path));
             model.reload();
         }
         saveSelectedNode=ThisPC;
