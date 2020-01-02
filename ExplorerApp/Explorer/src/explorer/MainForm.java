@@ -103,9 +103,9 @@ public class MainForm extends javax.swing.JFrame {
                 if(saveSelectedNode.toString().equals("ThisPC"))
                 {
                     if(selectedFilePath.equals(fp[0].getAbsolutePath()))
-                    this.setIcon(new ImageIcon("..\\icons\\oC.png"));
+                    this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oC.png")));
                     else
-                        this.setIcon(new ImageIcon("..\\icons\\oK.png"));
+                        this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oK.png")));
                     
                 }
                     
