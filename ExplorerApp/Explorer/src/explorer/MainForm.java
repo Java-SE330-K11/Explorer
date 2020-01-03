@@ -1250,7 +1250,8 @@ public class MainForm extends javax.swing.JFrame {
             for(int i=0;i<fs.length;i++)
                 if(fs[i].isDirectory())
                 {
-                    saveSelectedNode.add(new DefaultMutableTreeNode(fs[i].getPath()));
+                    if(!(fs[i].isHidden() && hiddenCheck.getState()==false))
+                        saveSelectedNode.add(new DefaultMutableTreeNode(fs[i].getPath()));
                 }
             DefaultTreeModel model = (DefaultTreeModel)Tree.getModel();
 
