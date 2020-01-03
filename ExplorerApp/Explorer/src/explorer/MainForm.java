@@ -89,6 +89,7 @@ public class MainForm extends javax.swing.JFrame {
         Tree.setCellRenderer(new TreeNodeRender());
         SetUpPopupMenus();
         jScrollPane2.getViewport().setBackground(Color.WHITE);
+        
     }
     class TableRender extends DefaultTableCellRenderer{
             public TableRender() { 
@@ -350,6 +351,11 @@ public class MainForm extends javax.swing.JFrame {
         btnPaste = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jToolBar3 = new javax.swing.JToolBar();
+        jTextField1 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         Table = new javax.swing.JTable();
@@ -653,6 +659,33 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnRefresh);
+        jToolBar1.add(filler1);
+
+        jToolBar3.setBackground(new java.awt.Color(255, 255, 255));
+        jToolBar3.setRollover(true);
+        jToolBar3.setMaximumSize(new java.awt.Dimension(341, 80));
+        jToolBar3.setMinimumSize(new java.awt.Dimension(341, 40));
+        jToolBar3.setPreferredSize(new java.awt.Dimension(100, 50));
+
+        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+        jTextField1.setText("Search..");
+        jTextField1.setToolTipText("search..");
+        jTextField1.setMaximumSize(new java.awt.Dimension(300, 30));
+        jTextField1.setMinimumSize(new java.awt.Dimension(300, 30));
+        jTextField1.setPreferredSize(new java.awt.Dimension(300, 40));
+        jToolBar3.add(jTextField1);
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/search.png"))); // NOI18N
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jButton1.setMaximumSize(new java.awt.Dimension(28, 28));
+        jButton1.setMinimumSize(new java.awt.Dimension(28, 23));
+        jButton1.setPreferredSize(new java.awt.Dimension(40, 40));
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar3.add(jButton1);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
         jSplitPane1.setBackground(new java.awt.Color(255, 255, 255));
         jSplitPane1.setDividerLocation(250);
@@ -721,26 +754,44 @@ public class MainForm extends javax.swing.JFrame {
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 433, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 985, Short.MAX_VALUE)
+            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
+            .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
-                .addComponent(jSplitPane1))
+                .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 491, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(63, 63, 63)
+                .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)))
+                    .addContainerGap(517, Short.MAX_VALUE)))
         );
 
         jMenuBar1.setPreferredSize(new java.awt.Dimension(148, 35));
@@ -2261,6 +2312,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnPaste;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUp;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JCheckBoxMenuItem hiddenCheck;
     private javax.swing.JMenuItem itemAbout;
     private javax.swing.JMenuItem itemCopy;
@@ -2273,6 +2325,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemPaste;
     private javax.swing.JMenuItem itemRename;
     private javax.swing.JMenuItem itemSellectAll;
+    private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem10;
@@ -2285,6 +2338,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar.Separator jSeparator1;
@@ -2297,8 +2351,10 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
+    private javax.swing.JToolBar jToolBar3;
     private javax.swing.JLabel lbAddress;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuPanel;
