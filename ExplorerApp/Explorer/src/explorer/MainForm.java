@@ -12,6 +12,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +77,7 @@ public class MainForm extends javax.swing.JFrame {
     
     public MainForm() {
         initComponents();
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
         Tree.setCellRenderer(new TreeNodeRender());
         
         SetUpPopupMenus();
@@ -459,6 +461,7 @@ public class MainForm extends javax.swing.JFrame {
         popupMenuPanel.add(jMenu1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Basic Explorer");
         setBackground(new java.awt.Color(255, 255, 255));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
