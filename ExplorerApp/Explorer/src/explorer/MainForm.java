@@ -2087,7 +2087,7 @@ public class MainForm extends javax.swing.JFrame {
                 }
         for(int i=0;i<n;i++)
             if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
-                if(paths[i].isFile() && paths[i].isHidden()==false)
+                if(paths[i].isFile() )
                 {
                     row[0]=paths[i].getName();
                     Date d = new Date(paths[i].lastModified());
