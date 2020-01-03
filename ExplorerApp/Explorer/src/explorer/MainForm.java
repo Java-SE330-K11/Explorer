@@ -33,6 +33,10 @@ import java.util.ArrayList;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.DosFileAttributes;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
@@ -320,6 +324,8 @@ public class MainForm extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jSeparator7 = new javax.swing.JPopupMenu.Separator();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        setHiddenCheck = new javax.swing.JCheckBoxMenuItem();
         popupMenuPanel = new javax.swing.JPopupMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
         jSeparator8 = new javax.swing.JPopupMenu.Separator();
@@ -418,6 +424,17 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         popupMenu.add(jMenuItem6);
+        popupMenu.add(jSeparator5);
+
+        setHiddenCheck.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        setHiddenCheck.setSelected(true);
+        setHiddenCheck.setText("Set Hidden");
+        setHiddenCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setHiddenCheckActionPerformed(evt);
+            }
+        });
+        popupMenu.add(setHiddenCheck);
 
         popupMenuPanel.setPreferredSize(new java.awt.Dimension(160, 130));
 
@@ -1942,6 +1959,19 @@ public class MainForm extends javax.swing.JFrame {
             setEnableItems();
             if(Table.getSelectedRowCount()>0)
             {
+                setHiddenCheck.setEnabled(true);
+                if(Table.getSelectedRowCount()>1) setHiddenCheck.setEnabled(false);
+                else
+                {
+                    JTable source = (JTable)evt.getSource();
+                    int row = source.rowAtPoint( evt.getPoint() );
+                    int column = source.columnAtPoint( evt.getPoint() );
+            
+                    String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
+                    File s=new File(str);
+                    if(s.isHidden()) setHiddenCheck.setState(true);
+                    else setHiddenCheck.setState(false);
+                }
                 popupMenu.show(this, 0, 0);
                 popupMenu.setLocation(MouseInfo.getPointerInfo().getLocation());
             }
@@ -1971,6 +2001,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void SetUpPopupMenus()
     {
+        
         jMenuItem2.setText("Copy             Ctrl+C");
         jMenuItem3.setText("Cut                Ctrl+X");
         jMenuItem4.setText("Delete");
@@ -2049,7 +2080,38 @@ public class MainForm extends javax.swing.JFrame {
         TreeMouseClicked(evtx);
         
     }//GEN-LAST:event_hiddenCheckActionPerformed
+
+    private void setHiddenCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setHiddenCheckActionPerformed
+        // TODO add your handling code here:
+        //JTable source = (JTable)evt.getSource();
+        
+        int row = Table.getSelectedRow();
+        String str=saveSelectedNode.toString()+"\\"+(String)Table.getModel().getValueAt(row, 0);
+        File s=new File(str);
+        Path filePath = Paths.get(str);
+        setHiddenAttrib(filePath,!(s.isHidden()));
+        //show lại trên table
+        String pathStr=(String)saveSelectedNode.getUserObject();
+        java.io.File selectedFile =new File(pathStr);
+        java.io.File[] pathss=selectedFile.listFiles();
+        if(pathStr=="ThisPC") 
+            pathss=java.io.File.listRoots();
     
+        ShowInTable(pathss,saveSelectedNode);
+    }//GEN-LAST:event_setHiddenCheckActionPerformed
+    
+    private static void setHiddenAttrib(Path filePath,boolean hide) {        
+        try {
+            DosFileAttributes attr = Files.readAttributes(filePath, DosFileAttributes.class);
+            System.out.println(filePath.getFileName() + " Hidden attribute is " + attr.isHidden());
+            Files.setAttribute(filePath, "dos:hidden", hide);
+            attr = Files.readAttributes(filePath, DosFileAttributes.class);
+            System.out.println(filePath.getFileName() + " Hidden attribute is " + attr.isHidden());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+    }
     
     void ShowInTable(File[] paths,DefaultMutableTreeNode selectedNode)
     {
@@ -2089,6 +2151,7 @@ public class MainForm extends javax.swing.JFrame {
             if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
                 if(paths[i].isFile() )
                 {
+                   
                     row[0]=paths[i].getName();
                     Date d = new Date(paths[i].lastModified());
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
@@ -2228,6 +2291,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JPopupMenu.Separator jSeparator8;
@@ -2238,6 +2302,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JLabel lbAddress;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuPanel;
+    private javax.swing.JCheckBoxMenuItem setHiddenCheck;
     private javax.swing.JTextField textAddress;
     // End of variables declaration//GEN-END:variables
 
