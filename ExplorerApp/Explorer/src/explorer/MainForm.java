@@ -56,9 +56,11 @@ public class MainForm extends javax.swing.JFrame {
     boolean isBacking=false;
     boolean isForwarding=false;
     boolean isSelectAll=false;
+    boolean isHidden=false;
     String strCreateNode=null;
     String strBack;
     String strForward;
+    
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
@@ -77,9 +79,10 @@ public class MainForm extends javax.swing.JFrame {
     
     public MainForm() {
         initComponents();
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
-        Tree.setCellRenderer(new TreeNodeRender());
         
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
+        hiddenCheck.setSelected(false);
+        Tree.setCellRenderer(new TreeNodeRender());
         SetUpPopupMenus();
         jScrollPane2.getViewport().setBackground(Color.WHITE);
     }
@@ -363,6 +366,8 @@ public class MainForm extends javax.swing.JFrame {
         itemSellectAll = new javax.swing.JMenuItem();
         Help = new javax.swing.JMenu();
         itemAbout = new javax.swing.JMenuItem();
+        View = new javax.swing.JMenu();
+        hiddenCheck = new javax.swing.JCheckBoxMenuItem();
 
         popupMenu.setOpaque(false);
         popupMenu.setPreferredSize(new java.awt.Dimension(200, 200));
@@ -837,6 +842,7 @@ public class MainForm extends javax.swing.JFrame {
         Help.setText("Help");
         Help.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
+        itemAbout.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         itemAbout.setText("About us");
         itemAbout.setToolTipText("More information");
         itemAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -847,6 +853,21 @@ public class MainForm extends javax.swing.JFrame {
         Help.add(itemAbout);
 
         jMenuBar1.add(Help);
+
+        View.setText("View");
+        View.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        hiddenCheck.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        hiddenCheck.setSelected(true);
+        hiddenCheck.setText("Show Hidden");
+        hiddenCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hiddenCheckActionPerformed(evt);
+            }
+        });
+        View.add(hiddenCheck);
+
+        jMenuBar1.add(View);
 
         setJMenuBar(jMenuBar1);
 
@@ -873,7 +894,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
         if(Tree.getLastSelectedPathComponent()==null) return;
-        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding)
+        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding && !isHidden)
         {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
@@ -958,10 +979,16 @@ public class MainForm extends javax.swing.JFrame {
                     selectedNode.removeAllChildren();
                 }
                 else
-                {
-                    ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
-                    selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
-                }
+                    if(isHidden)
+                    {
+                        ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
+                        selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+                    }
+                    else
+                    {
+                        ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
+                        selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+                    }
             
       
         //duong dan file dang duoc chon
@@ -974,7 +1001,8 @@ public class MainForm extends javax.swing.JFrame {
         for(File path:pathss)
             if(path.isDirectory())
             {
-                selectedNode.add(new DefaultMutableTreeNode(path.getAbsolutePath()));
+                if(!(path.isHidden() && hiddenCheck.getState()==false))
+                    selectedNode.add(new DefaultMutableTreeNode(path.getAbsolutePath()));
             }
         saveSelectedNode=selectedNode;
         ShowInTable(pathss,selectedNode);
@@ -2013,6 +2041,14 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         itemFileActionPerformed(evt);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void hiddenCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hiddenCheckActionPerformed
+        // TODO add your handling code here:
+        java.awt.event.MouseEvent evtx=new java.awt.event.MouseEvent(this,1,1,1,1,1,1,true);
+        isHidden=true;
+        TreeMouseClicked(evtx);
+        
+    }//GEN-LAST:event_hiddenCheckActionPerformed
     
     
     void ShowInTable(File[] paths,DefaultMutableTreeNode selectedNode)
@@ -2030,36 +2066,39 @@ public class MainForm extends javax.swing.JFrame {
         
 
         
-            for(int i=0;i<n;i++)
-            if(paths[i].isDirectory())
-            {
-                if(paths[i].getAbsolutePath().length()!=3)
-                row[0]=paths[i].getName();              
-                else
-                    row[0]=paths[i].getAbsolutePath();
-                Date d = new Date(paths[i].lastModified());
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
-                String strDate = formatter.format(d);
-                row[1]=strDate;
-                row[2]="Folder";
-                if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
-                row[3]="N/A";
-                if(selectedNode.toString().equals("ThisPC")) row[3]="loading...";
-                tableModel.addRow(row);
-            }
         for(int i=0;i<n;i++)
-            if(paths[i].isFile())
-            {
-                row[0]=paths[i].getName();
-                Date d = new Date(paths[i].lastModified());
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
-                String strDate = formatter.format(d);
-                row[1]=strDate;
-                row[2]="File";
-                if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
-                row[3]=paths[i].length()/1000+" KB";
-                tableModel.addRow(row);
-            }
+            if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
+                if(paths[i].isDirectory() )
+                {
+
+                    if(paths[i].getAbsolutePath().length()!=3)
+                    row[0]=paths[i].getName();              
+                    else
+                        row[0]=paths[i].getAbsolutePath();
+                    Date d = new Date(paths[i].lastModified());
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
+                    String strDate = formatter.format(d);
+                    row[1]=strDate;
+                    row[2]="Folder";
+                    if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
+                    row[3]="N/A";
+                    if(selectedNode.toString().equals("ThisPC")) row[3]="loading...";
+                    tableModel.addRow(row);
+                }
+        for(int i=0;i<n;i++)
+            if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
+                if(paths[i].isFile() && paths[i].isHidden()==false)
+                {
+                    row[0]=paths[i].getName();
+                    Date d = new Date(paths[i].lastModified());
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
+                    String strDate = formatter.format(d);
+                    row[1]=strDate;
+                    row[2]="File";
+                    if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
+                    row[3]=paths[i].length()/1000+" KB";
+                    tableModel.addRow(row);
+                }
         
         
         
@@ -2149,6 +2188,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu Help;
     private javax.swing.JTable Table;
     private javax.swing.JTree Tree;
+    private javax.swing.JMenu View;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCopy;
     private javax.swing.JButton btnCut;
@@ -2158,6 +2198,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnPaste;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUp;
+    private javax.swing.JCheckBoxMenuItem hiddenCheck;
     private javax.swing.JMenuItem itemAbout;
     private javax.swing.JMenuItem itemCopy;
     private javax.swing.JMenuItem itemCut;
