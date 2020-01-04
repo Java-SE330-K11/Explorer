@@ -2311,7 +2311,13 @@ public class MainForm extends javax.swing.JFrame {
         String path=Table.getValueAt(r, 0).toString();
         if(new File(path).isFile()==false)
             return;
-        JOptionPane.showMessageDialog(null,(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase(),"MD5",JOptionPane.INFORMATION_MESSAGE);
+        File f=new File(path);
+        String name=f.getName();
+        long size=f.length()/1000;
+        String hash=(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase();
+        CheckFormInformation c=new CheckFormInformation("MD5", hash, name, size);
+        c.setVisible(true);
+        //JOptionPane.showMessageDialog(null,(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase(),"MD5",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -2323,7 +2329,13 @@ public class MainForm extends javax.swing.JFrame {
             return;
         try{
             long crc=CRC32.checksumMappedFile(path);
-            JOptionPane.showMessageDialog(null,(Long.toHexString(crc)+"").toUpperCase(),"CRC32",JOptionPane.INFORMATION_MESSAGE);
+            File f=new File(path);
+            String name=f.getName();
+            long size=f.length()/1000;
+            String hash=(Long.toHexString(crc)+"").toUpperCase();
+            CheckFormInformation c=new CheckFormInformation("CRC32", hash, name, size);
+            c.setVisible(true);
+            //JOptionPane.showMessageDialog(null,(Long.toHexString(crc)+"").toUpperCase(),"CRC32",JOptionPane.INFORMATION_MESSAGE);
         }
         catch(Exception e){
             
@@ -2337,7 +2349,13 @@ public class MainForm extends javax.swing.JFrame {
         String path=Table.getValueAt(r, 0).toString();
         if(new File(path).isFile()==false)
             return;
-        JOptionPane.showMessageDialog(null,(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase(),"SHA-1",JOptionPane.INFORMATION_MESSAGE);
+        File f=new File(path);
+        String name=f.getName();
+        long size=f.length()/1000;
+        String hash=(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase();
+        CheckFormInformation c=new CheckFormInformation("SHA1", hash, name, size);
+        c.setVisible(true);
+        //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase(),"SHA-1",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
@@ -2347,7 +2365,13 @@ public class MainForm extends javax.swing.JFrame {
         String path=Table.getValueAt(r, 0).toString();
         if(new File(path).isFile()==false)
             return;
-        JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
+        File f=new File(path);
+        String name=f.getName();
+        long size=f.length()/1000;
+        String hash=(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase();
+        CheckFormInformation c=new CheckFormInformation("SHA256", hash, name, size);
+        c.setVisible(true);
+        //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
         
