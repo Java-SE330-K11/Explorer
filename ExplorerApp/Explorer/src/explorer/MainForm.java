@@ -5,6 +5,7 @@
  */
 package explorer;
 
+import com.github.junrar.Junrar;
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import java.awt.Component;
@@ -2652,6 +2653,18 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }
+        else
+             if(tmpEx.equals("rar"))
+        {
+            try{
+                 Junrar.extract(fileEx, selectedFile);
+            }
+           catch(Exception e)
+           {
+               //throw don't care
+           }
+        }
+        
     }
       
  
