@@ -41,6 +41,7 @@ import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableColumnModel;
 /**
  *
  * @author User
@@ -61,6 +62,7 @@ public class MainForm extends javax.swing.JFrame {
     boolean isForwarding=false;
     boolean isSelectAll=false;
     boolean isHidden=false;
+    boolean isSearching=false;
     String strCreateNode=null;
     String strBack;
     String strForward;
@@ -354,7 +356,7 @@ public class MainForm extends javax.swing.JFrame {
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jToolBar3 = new javax.swing.JToolBar();
         jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -581,6 +583,11 @@ public class MainForm extends javax.swing.JFrame {
                 btnGotoMouseClicked(evt);
             }
         });
+        btnGoto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGotoActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnGoto);
 
         jToolBar1.setBackground(new java.awt.Color(255, 255, 255));
@@ -668,22 +675,27 @@ public class MainForm extends javax.swing.JFrame {
         jToolBar3.setPreferredSize(new java.awt.Dimension(100, 50));
 
         jTextField1.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
-        jTextField1.setText("Search..");
+        jTextField1.setText("key");
         jTextField1.setToolTipText("search..");
         jTextField1.setMaximumSize(new java.awt.Dimension(300, 30));
         jTextField1.setMinimumSize(new java.awt.Dimension(300, 30));
-        jTextField1.setPreferredSize(new java.awt.Dimension(300, 40));
+        jTextField1.setPreferredSize(new java.awt.Dimension(300, 30));
         jToolBar3.add(jTextField1);
 
-        jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/search.png"))); // NOI18N
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jButton1.setMaximumSize(new java.awt.Dimension(28, 28));
-        jButton1.setMinimumSize(new java.awt.Dimension(28, 23));
-        jButton1.setPreferredSize(new java.awt.Dimension(40, 40));
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar3.add(jButton1);
+        btnSearch.setBackground(new java.awt.Color(255, 255, 255));
+        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/search.png"))); // NOI18N
+        btnSearch.setFocusable(false);
+        btnSearch.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnSearch.setMaximumSize(new java.awt.Dimension(28, 28));
+        btnSearch.setMinimumSize(new java.awt.Dimension(28, 23));
+        btnSearch.setPreferredSize(new java.awt.Dimension(40, 40));
+        btnSearch.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+        jToolBar3.add(btnSearch);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -967,8 +979,10 @@ public class MainForm extends javax.swing.JFrame {
             if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
                 return;
         }
+        //<editor-fold defaultstate="collapsed" desc="lấy node được chọn">
+
+
         
-        //lấy node được chọn
         DefaultMutableTreeNode selectedNode=null;
 
         if(isForwarding)
@@ -1058,7 +1072,8 @@ public class MainForm extends javax.swing.JFrame {
                         selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
                     }
             
-      
+        //</editor-fold>
+        
         //duong dan file dang duoc chon
         String pathStr=(String)selectedNode.getUserObject();
         java.io.File selectedFile =new File(pathStr);
@@ -1100,8 +1115,7 @@ public class MainForm extends javax.swing.JFrame {
         else itemRename.setEnabled(true);
     }//GEN-LAST:event_TreeMouseClicked
 
-    private void pasteAction()
-    {
+    private void pasteAction(){
          if(copy)
          {  
             for(int k =0; k<ArrCoppyFile.length;k++){
@@ -1238,8 +1252,7 @@ public class MainForm extends javax.swing.JFrame {
         pasteAction();
     }//GEN-LAST:event_btnPasteActionPerformed
 
-    private void loadTableWhenAction()
-    {
+    private void loadTableWhenAction(){
         String str=(String)saveSelectedNode.getUserObject();
         java.io.File selectedFile =new File(str);
         java.io.File[] paths=selectedFile.listFiles();
@@ -1361,8 +1374,7 @@ public class MainForm extends javax.swing.JFrame {
         CoppyAction(); 
     }//GEN-LAST:event_btnCopyActionPerformed
 
-    private void cutAction()
-    {
+    private void cutAction(){
         if(cut)
          {
             for(int k =0; k<ArrCoppyFile.length;k++){
@@ -1505,37 +1517,68 @@ public class MainForm extends javax.swing.JFrame {
         cutAction();
     }//GEN-LAST:event_btnCutActionPerformed
 
+
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
         // TODO add your handling code here:
         jScrollPane2.requestFocus();
         JTable source = (JTable)evt.getSource();
         if ((evt.getClickCount() == 2 || isOpen) && source.getSelectedRow() != -1)
         {
+            
             isOpen=false;
             int row = source.rowAtPoint( evt.getPoint() );
             int column = source.columnAtPoint( evt.getPoint() );
             
             String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
+            if(isSearching)
+            {
+                System.out.println((String)source.getModel().getValueAt(row, 4));
+                str=(String)source.getModel().getValueAt(row, 4);
+            }
             File s=new File(str);
             Desktop desktop = Desktop.getDesktop();
             try{
-                if(s.exists() && s.isFile()) desktop.open(s);
+                if(s.exists() && s.isFile()) 
+                {
+                    desktop.open(s);
+                }
                 else
                 {
-                    DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
-                    paths=s.listFiles();
-                    openingInTable=true;
-                    tableIndex=row;
-                    TreeMouseClicked(evt);
+                    if(isSearching)
+                    {
+                        textAddress.setText(str);
+                        btnGotoMouseClicked(evt);
+                    }
+                    else
+                    {
+                        DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
+                        paths=s.listFiles();
+                        openingInTable=true;
+                        tableIndex=row;
+                        TreeMouseClicked(evt);
+                    }
+                    
                 }
             }
                     
             catch(Exception ex)
             {
             }
+            
+            if(isSearching)
+            {
+                //duong dan file dang duoc chon
+                String pathStr=(String)saveSelectedNode.getUserObject();
+                java.io.File selectedFile =new File(pathStr);
+                java.io.File[] pathss=selectedFile.listFiles();
+                
+                ShowInTable(pathss,saveSelectedNode);
+                isSearching=false;
+            }
         }
     }//GEN-LAST:event_TableMouseClicked
 
+  //<editor-fold defaultstate="collapsed" desc="COPY, CUT, PASTE, BACK, rename, exit,refresh,..">
     private void itemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAboutActionPerformed
         // TODO add your handling code here:
         AboutForm aboutForm=new AboutForm();
@@ -1842,7 +1885,7 @@ public class MainForm extends javax.swing.JFrame {
              btnCut.setForeground(Color.BLACK);
         }
     }
-    
+
     private void jScrollPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseClicked
         // TODO add your handling code here:
         Table.clearSelection();
@@ -1937,7 +1980,10 @@ public class MainForm extends javax.swing.JFrame {
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         // TODO add your handling code here:
         loadTableWhenAction();
+        //duong dan file dang duoc chon
+        
     }//GEN-LAST:event_btnRefreshActionPerformed
+
 
     private void itemCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCopyActionPerformed
         // TODO add your handling code here:
@@ -2001,7 +2047,7 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnBackActionPerformed
 
-    
+    //</editor-fold>
     
     private void TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseReleased
         if(saveSelectedNode==null || saveSelectedNode.toString().equals("ThisPC")) 
@@ -2050,7 +2096,7 @@ public class MainForm extends javax.swing.JFrame {
             popupMenuPanel.setLocation(MouseInfo.getPointerInfo().getLocation());
         }
     }//GEN-LAST:event_jScrollPane2MouseReleased
-
+//<editor-fold defaultstate="collapsed" desc="JMenuItems, HIDDEN">
     private void SetUpPopupMenus()
     {
         
@@ -2078,6 +2124,9 @@ public class MainForm extends javax.swing.JFrame {
         
         
     }
+    
+    
+
     
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
@@ -2151,6 +2200,79 @@ public class MainForm extends javax.swing.JFrame {
     
         ShowInTable(pathss,saveSelectedNode);
     }//GEN-LAST:event_setHiddenCheckActionPerformed
+//</editor-fold>
+    
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        isSearching=true;
+        DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
+        
+        while(tableModel.getRowCount() > 0)
+        {
+            tableModel.removeRow(0);
+        }
+        String pathStr=(String)saveSelectedNode.getUserObject();
+        java.io.File selectedFile =new File(pathStr);
+        
+        addItemSearchToTable(selectedFile,tableModel);
+        
+        Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnGotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGotoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGotoActionPerformed
+
+        
+    private void addItemSearchToTable(File file,DefaultTableModel tableModel){
+        java.io.File[] pathss=file.listFiles();
+        int n=pathss.length;
+        Object row[]=new Object[5];
+        for(int i=0;i<n;i++)
+            if(!(pathss[i].isHidden() && hiddenCheck.getState()==false))
+                if(pathss[i].isDirectory() )
+                {
+                    
+                    if(pathss[i].getName().indexOf(jTextField1.getText())!=-1)
+                    {
+                        if(pathss[i].getAbsolutePath().length()!=3)
+                        row[0]=pathss[i].getName();              
+                        else
+                            row[0]=pathss[i].getAbsolutePath();
+                        Date d = new Date(pathss[i].lastModified());
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
+                        String strDate = formatter.format(d);
+                        row[1]=strDate;
+                        row[2]="Folder";
+                        row[3]="N/A";
+                        row[4]=pathss[i].getAbsolutePath();
+                        tableModel.addRow(row);
+                    }
+                    addItemSearchToTable(pathss[i],tableModel);
+                }
+        
+        for(int i=0;i<n;i++)
+            if(!(pathss[i].isHidden() && hiddenCheck.getState()==false))
+                if(pathss[i].isFile() )
+                {
+                    
+                    if(pathss[i].getName().indexOf(jTextField1.getText())!=-1)
+                    {
+                        
+                        row[0]=pathss[i].getName();
+                        Date d = new Date(pathss[i].lastModified());
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
+                        String strDate = formatter.format(d);
+                        row[1]=strDate;
+                        row[2]="File";
+                        row[3]=pathss[i].length()/1000+" KB";
+                        row[4]=pathss[i].getAbsolutePath();
+                        tableModel.addRow(row);
+                    }
+                    
+                }
+        
+    }
     
     private static void setHiddenAttrib(Path filePath,boolean hide) {        
         try {
@@ -2218,6 +2340,8 @@ public class MainForm extends javax.swing.JFrame {
         
         
         Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
+        
+        
     }
     
     private void loadTree()
@@ -2250,11 +2374,13 @@ public class MainForm extends javax.swing.JFrame {
         Object date_modified[]=new Object[n];
         Object type[]=new Object[n];
         Object size[]=new Object[n];
+        Object path[]=new Object[n];
         DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
         tableModel.addColumn("Name",name);
         tableModel.addColumn("Date modified",date_modified);
         tableModel.addColumn("Type",type);
         tableModel.addColumn("Size",size);
+        tableModel.addColumn("Path",path);
     }
     
 
@@ -2312,6 +2438,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnGoto;
     private javax.swing.JButton btnPaste;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUp;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JCheckBoxMenuItem hiddenCheck;
@@ -2326,7 +2453,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemPaste;
     private javax.swing.JMenuItem itemRename;
     private javax.swing.JMenuItem itemSellectAll;
-    private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem10;
