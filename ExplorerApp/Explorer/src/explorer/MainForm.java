@@ -74,6 +74,8 @@ public class MainForm extends javax.swing.JFrame {
     private boolean cut = false;
     private File fileCoppyPath;
     private File filePatsePath;
+    private File fileEx;
+    private String nameEx;
     
     private File[] ArrCoppyFile;
     private ArrayList<String> saveNode = new ArrayList<>();
@@ -357,7 +359,7 @@ public class MainForm extends javax.swing.JFrame {
         btnPaste = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        btnExtract = new javax.swing.JButton();
         jToolBar3 = new javax.swing.JToolBar();
         jTextField1 = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
@@ -675,7 +677,22 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnRefresh);
-        jToolBar1.add(filler1);
+
+        btnExtract.setBackground(new java.awt.Color(255, 255, 255));
+        btnExtract.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/archive.png"))); // NOI18N
+        btnExtract.setText("Extract");
+        btnExtract.setFocusable(false);
+        btnExtract.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnExtract.setMaximumSize(new java.awt.Dimension(90, 47));
+        btnExtract.setMinimumSize(new java.awt.Dimension(70, 40));
+        btnExtract.setName("btnExtract"); // NOI18N
+        btnExtract.setPreferredSize(new java.awt.Dimension(90, 47));
+        btnExtract.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExtractActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnExtract);
 
         jToolBar3.setBackground(new java.awt.Color(255, 255, 255));
         jToolBar3.setRollover(true);
@@ -2374,6 +2391,11 @@ public class MainForm extends javax.swing.JFrame {
         //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
+    private void btnExtractActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExtractActionPerformed
+        // TODO add your handling code here:
+        Extract();
+    }//GEN-LAST:event_btnExtractActionPerformed
+
         
     private void addItemSearchToTable(File file,DefaultTableModel tableModel){
         java.io.File[] pathss=file.listFiles();
@@ -2536,6 +2558,58 @@ public class MainForm extends javax.swing.JFrame {
         tableModel.addColumn("Path",path);
     }
     
+    public void Extract(){
+        String tmpEx;
+         //lấy node được chọn
+        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+        //if(selectedNode!=null) 
+        //selectedNode.removeAllChildren();
+      
+        String str=(String)selectedNode.getUserObject();
+        java.io.File selectedFile =new File(str);
+        java.io.File[] pathfirst = selectedFile.listFiles();
+        int length=pathfirst.length;
+        int dem=0;
+        
+        paths = new File[length];
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory())
+            {
+                 paths[dem]=pathfirst[i];
+                 dem++;
+            }   
+        }
+        for(int i=0;i<length;i++)
+        {
+            if(pathfirst[i].isDirectory()==false)
+            {
+                paths[dem]=pathfirst[i];
+                dem++;
+            }       
+        }
+        
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+        int SelectedRowIndex = Table.getSelectedRow();
+        fileEx = paths[SelectedRowIndex];
+        System.out.println(fileEx.toString());
+        tmpEx=fileEx.getName();
+        if(tmpEx.lastIndexOf(".") != -1 && tmpEx.lastIndexOf(".") != 0)
+        {
+         tmpEx = tmpEx.substring(tmpEx.lastIndexOf(".")+1);
+         System.out.println(tmpEx);
+        }
+        else 
+            return;
+         
+        if(tmpEx.equals("rar"))
+        {
+            System.out.println("It's rar");
+        }
+        else 
+            return;
+        
+    }
 
  
     
@@ -2587,13 +2661,13 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnCopy;
     private javax.swing.JButton btnCut;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnExtract;
     private javax.swing.JButton btnForward;
     private javax.swing.JButton btnGoto;
     private javax.swing.JButton btnPaste;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUp;
-    private javax.swing.Box.Filler filler1;
     private javax.swing.JCheckBoxMenuItem hiddenCheck;
     private javax.swing.JMenuItem itemAbout;
     private javax.swing.JMenuItem itemCopy;
