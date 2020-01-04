@@ -690,11 +690,6 @@ public class MainForm extends javax.swing.JFrame {
                 jTextField1MouseExited(evt);
             }
         });
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTextField1KeyTyped(evt);
-            }
-        });
         jToolBar3.add(jTextField1);
 
         btnSearch.setBackground(new java.awt.Color(255, 255, 255));
@@ -2262,17 +2257,6 @@ public class MainForm extends javax.swing.JFrame {
             jTextField1.setText("Search..");
     }//GEN-LAST:event_jTextField1MouseExited
 
-    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
-        // TODO add your handling code here:
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
-        {
-            System.out.println("khoa");
-            java.awt.event.ActionEvent newEvt=new java.awt.event.ActionEvent(this,0,"");
-            btnSearchActionPerformed(newEvt);
-        }
-        
-    }//GEN-LAST:event_jTextField1KeyTyped
-
         
     private void addItemSearchToTable(File file,DefaultTableModel tableModel){
         java.io.File[] pathss=file.listFiles();
@@ -2283,7 +2267,7 @@ public class MainForm extends javax.swing.JFrame {
                 if(pathss[i].isDirectory() )
                 {
                     
-                    if(pathss[i].getName().indexOf(jTextField1.getText())!=-1)
+                    if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
                     {
                         if(pathss[i].getAbsolutePath().length()!=3)
                         row[0]=pathss[i].getName();              
@@ -2306,7 +2290,7 @@ public class MainForm extends javax.swing.JFrame {
                 if(pathss[i].isFile() )
                 {
                     
-                    if(pathss[i].getName().indexOf(jTextField1.getText())!=-1)
+                    if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
                     {
                         
                         row[0]=pathss[i].getName();
