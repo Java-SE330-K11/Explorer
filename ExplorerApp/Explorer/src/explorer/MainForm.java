@@ -966,7 +966,7 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenuBar1.add(View);
 
-        jMenu2.setText("Check hash");
+        jMenu2.setText("CheckHash");
         jMenu2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jMenuItem1.setText("CRC32");
