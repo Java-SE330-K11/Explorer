@@ -104,27 +104,28 @@ public class MainForm extends javax.swing.JFrame {
             {
                 super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
                 String path=(String)table.getModel().getValueAt(row, column);
-                String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
+                //String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
                 
                 
                 this.setOpaque(true);
                 File []fp=java.io.File.listRoots();
-                for(File f : fp){
-                    if(f.getAbsolutePath().equals(path))
-                        selectedFilePath=path;
-                }
-                this.setIcon(FileSystemView.getFileSystemView().getSystemIcon(new File(selectedFilePath)));
+//                for(File f : fp){
+//                    if(f.getAbsolutePath().equals(path))
+//                        selectedFilePath=path;
+//                }
+                
                 if(saveSelectedNode.toString().equals("ThisPC"))
                 {
-                    if(selectedFilePath.equals(fp[0].getAbsolutePath()))
+                    if(path.equals(fp[0].getAbsolutePath()))
                     this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oC.png")));
                     else
                         this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oK.png")));
                     
                 }
-                    
+                else
+                this.setIcon(FileSystemView.getFileSystemView().getSystemIcon(new File(path)));
                 
-                this.setText(path);
+                this.setText(new File(path).getName());
                 this.setBackground(Color.WHITE);
                 if (isSelected)
                 {
@@ -1549,7 +1550,8 @@ public class MainForm extends javax.swing.JFrame {
             int row = source.rowAtPoint( evt.getPoint() );
             int column = source.columnAtPoint( evt.getPoint() );
             
-            String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
+            String str;//=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
+            str=(String)source.getModel().getValueAt(row, 0);
             if(isSearching)
             {
                 System.out.println((String)source.getModel().getValueAt(row, 4));
@@ -2238,7 +2240,7 @@ public class MainForm extends javax.swing.JFrame {
         
         addItemSearchToTable(selectedFile,tableModel);
         
-        Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
+        //Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnGotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGotoActionPerformed
@@ -2269,9 +2271,9 @@ public class MainForm extends javax.swing.JFrame {
                     
                     if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
                     {
-                        if(pathss[i].getAbsolutePath().length()!=3)
-                        row[0]=pathss[i].getName();              
-                        else
+//                        if(pathss[i].getAbsolutePath().length()!=3)
+//                        row[0]=pathss[i].getName();              
+//                        else
                             row[0]=pathss[i].getAbsolutePath();
                         Date d = new Date(pathss[i].lastModified());
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
@@ -2293,7 +2295,8 @@ public class MainForm extends javax.swing.JFrame {
                     if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
                     {
                         
-                        row[0]=pathss[i].getName();
+                        //row[0]=pathss[i].getName();
+                        row[0]=pathss[i].getAbsolutePath();
                         Date d = new Date(pathss[i].lastModified());
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                         String strDate = formatter.format(d);
@@ -2341,9 +2344,9 @@ public class MainForm extends javax.swing.JFrame {
                 if(paths[i].isDirectory() )
                 {
 
-                    if(paths[i].getAbsolutePath().length()!=3)
-                    row[0]=paths[i].getName();              
-                    else
+//                    if(paths[i].getAbsolutePath().length()!=3)
+//                    row[0]=paths[i].getName();              
+//                    else
                         row[0]=paths[i].getAbsolutePath();
                     Date d = new Date(paths[i].lastModified());
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
@@ -2360,7 +2363,8 @@ public class MainForm extends javax.swing.JFrame {
                 if(paths[i].isFile() )
                 {
                    
-                    row[0]=paths[i].getName();
+                    //row[0]=paths[i].getName();
+                    row[0]=paths[i].getAbsolutePath();
                     Date d = new Date(paths[i].lastModified());
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                     String strDate = formatter.format(d);
