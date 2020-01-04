@@ -44,6 +44,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+import javax.xml.bind.DatatypeConverter;
 /**
  *
  * @author User
@@ -385,6 +386,11 @@ public class MainForm extends javax.swing.JFrame {
         itemAbout = new javax.swing.JMenuItem();
         View = new javax.swing.JMenu();
         hiddenCheck = new javax.swing.JCheckBoxMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
 
         popupMenu.setOpaque(false);
         popupMenu.setPreferredSize(new java.awt.Dimension(200, 200));
@@ -959,6 +965,43 @@ public class MainForm extends javax.swing.JFrame {
         View.add(hiddenCheck);
 
         jMenuBar1.add(View);
+
+        jMenu2.setText("Check hash");
+        jMenu2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        jMenuItem1.setText("CRC32");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jMenuItem11.setText("MD5");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem11);
+
+        jMenuItem12.setText("SHA-1");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem12);
+
+        jMenuItem13.setText("SHA-256");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem13);
+
+        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -2258,6 +2301,54 @@ public class MainForm extends javax.swing.JFrame {
         if(jTextField1.getText().equals(""))
             jTextField1.setText("Search..");
     }//GEN-LAST:event_jTextField1MouseExited
+    private static String toHex(byte[] bytes) {
+        return DatatypeConverter.printHexBinary(bytes);
+    }
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        // TODO add your handling code here:
+        int r=Table.getSelectedRow();
+        if(r<0) return;
+        String path=Table.getValueAt(r, 0).toString();
+        if(new File(path).isFile()==false)
+            return;
+        JOptionPane.showMessageDialog(null,(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase(),"MD5",JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        int r=Table.getSelectedRow();
+        if(r<0) return;
+        String path=Table.getValueAt(r, 0).toString();
+        if(new File(path).isFile()==false)
+            return;
+        try{
+            long crc=CRC32.checksumMappedFile(path);
+            JOptionPane.showMessageDialog(null,(Long.toHexString(crc)+"").toUpperCase(),"CRC32",JOptionPane.INFORMATION_MESSAGE);
+        }
+        catch(Exception e){
+            
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        // TODO add your handling code here:
+        int r=Table.getSelectedRow();
+        if(r<0) return;
+        String path=Table.getValueAt(r, 0).toString();
+        if(new File(path).isFile()==false)
+            return;
+        JOptionPane.showMessageDialog(null,(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase(),"SHA-1",JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
+    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
+        // TODO add your handling code here:
+        int r=Table.getSelectedRow();
+        if(r<0) return;
+        String path=Table.getValueAt(r, 0).toString();
+        if(new File(path).isFile()==false)
+            return;
+        JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jMenuItem13ActionPerformed
 
         
     private void addItemSearchToTable(File file,DefaultTableModel tableModel){
@@ -2492,8 +2583,13 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemRename;
     private javax.swing.JMenuItem itemSellectAll;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
+    private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
