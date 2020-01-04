@@ -45,6 +45,12 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 import javax.xml.bind.DatatypeConverter;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 /**
  *
  * @author User
@@ -2602,15 +2608,52 @@ public class MainForm extends javax.swing.JFrame {
         else 
             return;
          
-        if(tmpEx.equals("rar"))
+        if(tmpEx.equals("zip"))
         {
-            System.out.println("It's rar");
+            System.out.println("It's zip");
+             // Tạo một buffer (Bộ đệm).
+        byte[] buffer = new byte[1024];
+ 
+        ZipInputStream zipIs = null;
+        try {
+            // Tạo đối tượng ZipInputStream để đọc file từ 1 đường dẫn (path).
+            zipIs = new ZipInputStream(new FileInputStream(fileEx));
+ 
+            ZipEntry entry = null;
+            // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
+            while ((entry = zipIs.getNextEntry()) != null) {
+                String entryName = entry.getName();
+                String outFileName = selectedFile + "\\\\"+ entryName;
+                System.out.println("Unzip: " + outFileName);
+ 
+                if (entry.isDirectory()) {
+                    // Tạo các thư mục.
+                    new File(outFileName).mkdirs();
+                } else {
+                    // Tạo một Stream để ghi dữ liệu vào file.
+                    FileOutputStream fos = new FileOutputStream(outFileName);
+ 
+                    int len;
+                    // Đọc dữ liệu trên Entry hiện tại.
+                    while ((len = zipIs.read(buffer)) > 0) {
+                        fos.write(buffer, 0, len);
+                    }
+ 
+                    fos.close();
+                }
+ 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                zipIs.close();
+            } catch (Exception e) {
+            }
         }
-        else 
-            return;
-        
     }
-
+    }
+      
  
     
     /**
