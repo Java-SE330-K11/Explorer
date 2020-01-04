@@ -14,6 +14,7 @@ import java.awt.Font;
 import java.awt.MouseInfo;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
@@ -37,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.DosFileAttributes;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
@@ -675,11 +677,24 @@ public class MainForm extends javax.swing.JFrame {
         jToolBar3.setPreferredSize(new java.awt.Dimension(100, 50));
 
         jTextField1.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
-        jTextField1.setText("key");
+        jTextField1.setText("Search..");
         jTextField1.setToolTipText("search..");
         jTextField1.setMaximumSize(new java.awt.Dimension(300, 30));
         jTextField1.setMinimumSize(new java.awt.Dimension(300, 30));
         jTextField1.setPreferredSize(new java.awt.Dimension(300, 30));
+        jTextField1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTextField1MouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jTextField1MouseExited(evt);
+            }
+        });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
         jToolBar3.add(jTextField1);
 
         btnSearch.setBackground(new java.awt.Color(255, 255, 255));
@@ -969,6 +984,16 @@ public class MainForm extends javax.swing.JFrame {
         loadTree();
         loadTable();
         TableCellListener tcl=new TableCellListener(Table,Tree);
+        Action action = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                java.awt.event.ActionEvent newEvt=new java.awt.event.ActionEvent(this,0,"");
+                btnSearchActionPerformed(newEvt);
+            }
+        };
+        jTextField1.addActionListener( action );
     }//GEN-LAST:event_formWindowOpened
 
 
@@ -1576,6 +1601,7 @@ public class MainForm extends javax.swing.JFrame {
                 isSearching=false;
             }
         }
+        
     }//GEN-LAST:event_TableMouseClicked
 
   //<editor-fold defaultstate="collapsed" desc="COPY, CUT, PASTE, BACK, rename, exit,refresh,..">
@@ -2204,6 +2230,7 @@ public class MainForm extends javax.swing.JFrame {
     
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // TODO add your handling code here:
+        if(saveSelectedNode.toString().equals("ThisPC")) return;
         isSearching=true;
         DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
         
@@ -2222,6 +2249,29 @@ public class MainForm extends javax.swing.JFrame {
     private void btnGotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGotoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnGotoActionPerformed
+
+    private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
+        // TODO add your handling code here:
+        if(jTextField1.getText().equals("Search.."))
+            jTextField1.setText("");
+    }//GEN-LAST:event_jTextField1MouseClicked
+
+    private void jTextField1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseExited
+        // TODO add your handling code here:
+        if(jTextField1.getText().equals(""))
+            jTextField1.setText("Search..");
+    }//GEN-LAST:event_jTextField1MouseExited
+
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+        {
+            System.out.println("khoa");
+            java.awt.event.ActionEvent newEvt=new java.awt.event.ActionEvent(this,0,"");
+            btnSearchActionPerformed(newEvt);
+        }
+        
+    }//GEN-LAST:event_jTextField1KeyTyped
 
         
     private void addItemSearchToTable(File file,DefaultTableModel tableModel){
