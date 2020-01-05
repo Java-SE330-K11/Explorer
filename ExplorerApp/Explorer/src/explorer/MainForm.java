@@ -2660,15 +2660,23 @@ public class MainForm extends javax.swing.JFrame {
                 System.out.println("Zipping " + filePath);
                 // entryName: is a relative path.
                 String entryName = filePath.substring(selectedFile.getAbsolutePath().length() + 1);
+                if(file.isDirectory())
+                {
+                    entryName+="\\";
+                }
+                 System.out.println("Zipping " + entryName);
                 ZipEntry ze = new ZipEntry(entryName);
                 // Thêm entry vào file zip.
                 zipOs.putNextEntry(ze);
+                if(file.isFile())
+                {
                 try ( // Đọc dữ liệu của file và ghi vào ZipOutputStream.
                         FileInputStream fileIs = new FileInputStream(filePath)) {
                     int len;
                     while ((len = fileIs.read(buffer)) > 0) {
                         zipOs.write(buffer, 0, len);
                     }
+                }
                 }
                 
         }
@@ -2701,6 +2709,7 @@ public class MainForm extends javax.swing.JFrame {
             if (file.isFile()) {
                 allFiles.add(file);
             } else {
+                allFiles.add(file);
                 List<File> files = this.listChildFiles(file, 1, source);
                 allFiles.addAll(files);
             }
