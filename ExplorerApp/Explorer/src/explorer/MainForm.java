@@ -2524,7 +2524,7 @@ public class MainForm extends javax.swing.JFrame {
                 // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
                 while ((entry = zipIs.getNextEntry()) != null) {
                     String entryName = entry.getName();
-                    String outFileName = selectedFile + "\\\\" + entryName;
+                    String outFileName = selectedFile.toString() + "\\" + entryName;
                     System.out.println("Unzip: " + outFileName);
 
                     if (entry.isDirectory()) {
@@ -2670,7 +2670,9 @@ public class MainForm extends javax.swing.JFrame {
                         zipOs.write(buffer, 0, len);
                     }
                 }
+                
         }
+              
 
         } catch (IOException e) {
             e.printStackTrace();
