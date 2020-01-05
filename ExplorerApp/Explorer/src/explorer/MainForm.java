@@ -53,8 +53,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
@@ -88,9 +90,11 @@ public class MainForm extends javax.swing.JFrame {
     private File fileCoppyPath;
     private File filePatsePath;
     private File fileEx;
+    private File fileAr;
     private String nameEx;
 
     private File[] ArrCoppyFile;
+    private File[] ArrFileEx;
     private ArrayList<String> saveNode = new ArrayList<>();
     int index = -1;
 
@@ -704,6 +708,11 @@ public class MainForm extends javax.swing.JFrame {
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton1);
 
         jToolBar3.setBackground(new java.awt.Color(255, 255, 255));
@@ -2298,6 +2307,11 @@ public class MainForm extends javax.swing.JFrame {
         Extract();
     }//GEN-LAST:event_btnExtractActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        addToArchive();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     private void addItemSearchToTable(File file, DefaultTableModel tableModel) {
         java.io.File[] pathss = file.listFiles();
         int n = pathss.length;
@@ -2537,50 +2551,138 @@ public class MainForm extends javax.swing.JFrame {
                 } catch (Exception e) {
                 }
             }
-        } else if (tmpEx.equals("rar")) {
-            try {
-                Junrar.extract(fileEx, selectedFile);
-            } catch (Exception e) {
-                //throw don't care
-            }
-        } else if (tmpEx.equals("7z")) {
-            SevenZFile sevenZFile = null;
-            SevenZArchiveEntry entry = null;
-            try {
-                sevenZFile = new SevenZFile(fileEx);
-                entry = sevenZFile.getNextEntry();
-            } catch (Exception e) {
-                //throw don't care
-            }
-            while (entry != null) {
-                try {
-                    System.out.println(entry.getName());
-                    FileOutputStream out=null;
-                    try {
-                        out = new FileOutputStream(entry.getName());
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    byte[] content = new byte[(int) entry.getSize()];
-                    sevenZFile.read(content, 0, content.length);
-                    try{
-                    out.write(content);
-                    out.close();
-                    entry = sevenZFile.getNextEntry();
-                    sevenZFile.close();
-                    }
-                    catch(Exception e)
-                    {
-                        //throw
-                    }
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            }
-
         }
+        //Can't use class in jar third party
+//        } else if (tmpEx.equals("rar")) {
+//            try {
+//                Junrar.extract(fileEx, selectedFile);
+//            } catch (Exception e) {
+//                //throw don't care
+//            }
+//        } else if (tmpEx.equals("7z")) {
+//            SevenZFile sevenZFile = null;
+//            SevenZArchiveEntry entry = null;
+//            try {
+//                sevenZFile = new SevenZFile(fileEx);
+//                entry = sevenZFile.getNextEntry();
+//            } catch (Exception e) {
+//                //throw don't care
+//            }
+//            while (entry != null) {
+//                try {
+//                    System.out.println(entry.getName());
+//                    FileOutputStream out=null;
+//                    try {
+//                        out = new FileOutputStream(entry.getName());
+//                    } catch (FileNotFoundException ex) {
+//                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                    byte[] content = new byte[(int) entry.getSize()];
+//                    sevenZFile.read(content, 0, content.length);
+//                    try{
+//                    out.write(content);
+//                    out.close();
+//                    entry = sevenZFile.getNextEntry();
+//                    sevenZFile.close();
+//                    }
+//                    catch(Exception e)
+//                    {
+//                        //throw
+//                    }
+//                    
+//                } catch (IOException ex) {
+//                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//
+//            }
+//}
+        loadTableWhenAction();
+    }
+
+    public void addToArchive() {
+        //lấy node được chọn
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
+        //if(selectedNode!=null) 
+        //selectedNode.removeAllChildren();
+
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
+        java.io.File[] pathfirst = selectedFile.listFiles();
+        int length = pathfirst.length;
+        int dem = 0;
+
+        paths = new File[length];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+        int[] SelectedRowIndex = Table.getSelectedRows();
+        if (SelectedRowIndex.length == 0) {
+            return;
+        }
+        ArrFileEx = new File[SelectedRowIndex.length];
+        tmpF = new String[SelectedRowIndex.length];
+        for (int i = 0; i < SelectedRowIndex.length; i++) {
+            fileAr = paths[SelectedRowIndex[i]];
+            ArrFileEx[i] = fileAr;
+        }
+        int g = -1;
+        String nameAr=null;
+        while (g < 0) {
+            String input = JOptionPane.showInputDialog("Vui lòng nhập tên file nén");
+            Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
+
+            if (regex.matcher(input).find() == false && input!=null) {
+                g++;
+                nameAr = input;
+            }
+        }
+        byte[] buffer = new byte[1024];
+        FileOutputStream fileOs = null;
+        ZipOutputStream zipOs = null;
+        try {
+            fileOs = new FileOutputStream(new File(selectedFile.toString()+"\\\\"+nameAr+".zip"));
+            zipOs = new ZipOutputStream(fileOs);
+            for (int i = 0; i < SelectedRowIndex.length; i++) {
+                String filePath = ArrFileEx[i].getAbsolutePath();
+                System.out.println("Zipping " + filePath);
+                // entryName: is a relative path.
+                String entryName = filePath.substring(selectedFile.getAbsolutePath().length() + 1);
+                ZipEntry ze = new ZipEntry(entryName);
+                // Thêm entry vào file zip.
+                zipOs.putNextEntry(ze);
+                try ( // Đọc dữ liệu của file và ghi vào ZipOutputStream.
+                        FileInputStream fileIs = new FileInputStream(filePath)) {
+                    int len;
+                    while ((len = fileIs.read(buffer)) > 0) {
+                        zipOs.write(buffer, 0, len);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                zipOs.close();
+            } catch (Exception e) {
+            }
+            try {
+                fileOs.close();
+            } catch (Exception e) {
+            }
+        }
+       loadTable();
     }
 
     /**
