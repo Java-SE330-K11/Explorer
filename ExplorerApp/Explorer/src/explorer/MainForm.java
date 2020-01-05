@@ -58,6 +58,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
@@ -2524,6 +2527,50 @@ public class MainForm extends javax.swing.JFrame {
                 ZipEntry entry = null;
                 // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
                 while ((entry = zipIs.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    String outFileName = selectedFile.toString() + "\\" + entryName;
+                    System.out.println("Unzip: " + outFileName);
+
+                    if (entry.isDirectory()) {
+                        // Tạo các thư mục.
+                        new File(outFileName).mkdirs();
+                    } else {
+                        // Tạo một Stream để ghi dữ liệu vào file.
+                        FileOutputStream fos = new FileOutputStream(outFileName);
+
+                        int len;
+                        // Đọc dữ liệu trên Entry hiện tại.
+                        while ((len = zipIs.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+
+                        fos.close();
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    zipIs.close();
+                } catch (Exception e) {
+                }
+            }
+        }else
+            if (tmpEx.equals("jar")) {
+            System.out.println("It's jar");
+            // Tạo một buffer (Bộ đệm).
+            byte[] buffer = new byte[1024];
+
+            JarInputStream zipIs = null;
+            new File(selectedFile.toString()+"\\META-INF").mkdirs();
+            try {
+                // Tạo đối tượng ZipInputStream để đọc file từ 1 đường dẫn (path).
+                zipIs = new JarInputStream(new FileInputStream(fileEx));
+
+                JarEntry entry = null;
+                // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
+                while ((entry = zipIs.getNextJarEntry()) != null) {
                     String entryName = entry.getName();
                     String outFileName = selectedFile.toString() + "\\" + entryName;
                     System.out.println("Unzip: " + outFileName);
