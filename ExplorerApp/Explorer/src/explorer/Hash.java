@@ -14,13 +14,7 @@ import java.security.MessageDigest;
  *
  * @author DungHK
  */
-public enum Hash {
-
-    MD5("MD5"),
-    SHA1("SHA1"),
-    SHA256("SHA-256"),
-    SHA512("SHA-512");
-    //CRC32("CRC-32");
+public class Hash {
 
     private String name;
 

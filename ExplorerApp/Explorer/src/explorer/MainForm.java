@@ -2247,7 +2247,7 @@ public class MainForm extends javax.swing.JFrame {
         File f = new File(path);
         String name = f.getName();
         long size = f.length() / 1000;
-        String hash = (toHex(Hash.MD5.checksum(new File(path))) + "").toUpperCase();
+        String hash = (toHex(new Hash("MD5").checksum(new File(path))) + "").toUpperCase();
         CheckFormInformation c = new CheckFormInformation("MD5", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase(),"MD5",JOptionPane.INFORMATION_MESSAGE);
@@ -2290,7 +2290,7 @@ public class MainForm extends javax.swing.JFrame {
         File f = new File(path);
         String name = f.getName();
         long size = f.length() / 1000;
-        String hash = (toHex(Hash.SHA1.checksum(new File(path))) + "").toUpperCase();
+        String hash = (toHex(new Hash("SHA-1").checksum(new File(path))) + "").toUpperCase();
         CheckFormInformation c = new CheckFormInformation("SHA1", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase(),"SHA-1",JOptionPane.INFORMATION_MESSAGE);
@@ -2309,7 +2309,7 @@ public class MainForm extends javax.swing.JFrame {
         File f = new File(path);
         String name = f.getName();
         long size = f.length() / 1000;
-        String hash = (toHex(Hash.SHA256.checksum(new File(path))) + "").toUpperCase();
+        String hash = (toHex(new Hash("SHA-256").checksum(new File(path))) + "").toUpperCase();
         CheckFormInformation c = new CheckFormInformation("SHA256", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
