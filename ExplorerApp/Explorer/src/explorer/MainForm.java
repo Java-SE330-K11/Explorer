@@ -49,9 +49,15 @@ import javax.xml.bind.DatatypeConverter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+
 /**
  *
  * @author User
@@ -62,266 +68,257 @@ public class MainForm extends javax.swing.JFrame {
     //khoa
     String[] tmpS;
     String[] tmpF;
-    boolean openingInTable=false;
-    int tableIndex=-1;
-    boolean isUp=false;
-    boolean isOpen=false;
-    boolean isGotoAddress=false;
-    boolean isCreatingNode=false;
-    boolean isBacking=false;
-    boolean isForwarding=false;
-    boolean isSelectAll=false;
-    boolean isHidden=false;
-    boolean isSearching=false;
-    String strCreateNode=null;
+    boolean openingInTable = false;
+    int tableIndex = -1;
+    boolean isUp = false;
+    boolean isOpen = false;
+    boolean isGotoAddress = false;
+    boolean isCreatingNode = false;
+    boolean isBacking = false;
+    boolean isForwarding = false;
+    boolean isSelectAll = false;
+    boolean isHidden = false;
+    boolean isSearching = false;
+    String strCreateNode = null;
     String strBack;
     String strForward;
-    
+
     private boolean copy = false;
     private boolean cut = false;
     private File fileCoppyPath;
     private File filePatsePath;
     private File fileEx;
     private String nameEx;
-    
+
     private File[] ArrCoppyFile;
     private ArrayList<String> saveNode = new ArrayList<>();
-    int index=-1;
-    
-    private boolean isRenameClick=false;
-    private boolean isTaoMoiThuMuc=false;
-    private boolean isTaoMoiFile=false;
+    int index = -1;
+
+    private boolean isRenameClick = false;
+    private boolean isTaoMoiThuMuc = false;
+    private boolean isTaoMoiFile = false;
     private File[] paths;
-    private DefaultMutableTreeNode saveSelectedNode=null;
-    private DefaultMutableTreeNode treeRoot=null;
-    
+    private DefaultMutableTreeNode saveSelectedNode = null;
+    private DefaultMutableTreeNode treeRoot = null;
+
     public MainForm() {
         initComponents();
-        
+
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
         hiddenCheck.setSelected(false);
         Tree.setCellRenderer(new TreeNodeRender());
         SetUpPopupMenus();
         jScrollPane2.getViewport().setBackground(Color.WHITE);
-        
+
     }
-    class TableRender extends DefaultTableCellRenderer{
-            public TableRender() { 
-            
-            }
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-            {
-                super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
-                String path=(String)table.getModel().getValueAt(row, column);
-                //String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
-                
-                
-                this.setOpaque(true);
-                File []fp=java.io.File.listRoots();
+
+    class TableRender extends DefaultTableCellRenderer {
+
+        public TableRender() {
+
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            String path = (String) table.getModel().getValueAt(row, column);
+            //String selectedFilePath=saveSelectedNode.toString()+"\\"+path;
+
+            this.setOpaque(true);
+            File[] fp = java.io.File.listRoots();
 //                for(File f : fp){
 //                    if(f.getAbsolutePath().equals(path))
 //                        selectedFilePath=path;
 //                }
-                
-                if(saveSelectedNode.toString().equals("ThisPC"))
-                {
-                    if(path.equals(fp[0].getAbsolutePath()))
+
+            if (saveSelectedNode.toString().equals("ThisPC")) {
+                if (path.equals(fp[0].getAbsolutePath())) {
                     this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oC.png")));
-                    else
-                        this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oK.png")));
-                    
+                } else {
+                    this.setIcon(new ImageIcon(getClass().getResource("/explorer/image/oK.png")));
                 }
-                else
+
+            } else {
                 this.setIcon(FileSystemView.getFileSystemView().getSystemIcon(new File(path)));
-                
-                this.setText(new File(path).getName());
-                this.setBackground(Color.WHITE);
-                if (isSelected)
-                {
-                    setBackground(table.getSelectionBackground());
-                }
-                else
-                {
-                    setBackground(table.getBackground());
-                }
-                return this;
             }
+
+            this.setText(new File(path).getName());
+            this.setBackground(Color.WHITE);
+            if (isSelected) {
+                setBackground(table.getSelectionBackground());
+            } else {
+                setBackground(table.getBackground());
+            }
+            return this;
+        }
     }
-    class CustomEditor extends DefaultCellEditor{
+
+    class CustomEditor extends DefaultCellEditor {
 
         public CustomEditor(JTextField textField) {
             super(textField);
         }
+
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            
+
             JTextField editor = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
 
-            if(column!=0) return null;
-            if((column==0) && (isRenameClick==false && isTaoMoiThuMuc==false && isTaoMoiFile==false)) return null;
-            if (value != null)
-                {
-                    editor.setText(value.toString());
-                }
-            if(value==null)
-                {
-                    editor.setText("nothing");
-                }   
+            if (column != 0) {
+                return null;
+            }
+            if ((column == 0) && (isRenameClick == false && isTaoMoiThuMuc == false && isTaoMoiFile == false)) {
+                return null;
+            }
+            if (value != null) {
+                editor.setText(value.toString());
+            }
+            if (value == null) {
+                editor.setText("nothing");
+            }
             return editor;
         }
     }
-    public class TableCellListener implements PropertyChangeListener, Runnable
-    {
-	private JTable table;
+
+    public class TableCellListener implements PropertyChangeListener, Runnable {
+
+        private JTable table;
         private JTree tree;
-	private Action action;
+        private Action action;
 
-	private int row;
-	private int column;
-	private Object oldValue;
-	private Object newValue;
+        private int row;
+        private int column;
+        private Object oldValue;
+        private Object newValue;
 
-	public TableCellListener(JTable table, JTree tree)
-	{
-		this.table = table;
-		this.tree = tree;
-		this.table.addPropertyChangeListener( this );
-	}
+        public TableCellListener(JTable table, JTree tree) {
+            this.table = table;
+            this.tree = tree;
+            this.table.addPropertyChangeListener(this);
+        }
 
-	
-	private TableCellListener(JTable table, int row, int column, Object oldValue, Object newValue)
-	{
-		this.table = table;
-		this.row = row;
-		this.column = column;
-		this.oldValue = oldValue;
-		this.newValue = newValue;
-	}
+        private TableCellListener(JTable table, int row, int column, Object oldValue, Object newValue) {
+            this.table = table;
+            this.row = row;
+            this.column = column;
+            this.oldValue = oldValue;
+            this.newValue = newValue;
+        }
 
-	/**
-	 *  Get the column that was last edited
-	 *
-	 *  @return the column that was edited
-	 */
-	public int getColumn()
-	{
-		return column;
-	}
+        /**
+         * Get the column that was last edited
+         *
+         * @return the column that was edited
+         */
+        public int getColumn() {
+            return column;
+        }
 
-	/**
-	 *  Get the new value in the cell
-	 *
-	 *  @return the new value in the cell
-	 */
-	public Object getNewValue()
-	{
-		return newValue;
-	}
+        /**
+         * Get the new value in the cell
+         *
+         * @return the new value in the cell
+         */
+        public Object getNewValue() {
+            return newValue;
+        }
 
-	/**
-	 *  Get the old value of the cell
-	 *
-	 *  @return the old value of the cell
-	 */
-	public Object getOldValue()
-	{
-		return oldValue;
-	}
+        /**
+         * Get the old value of the cell
+         *
+         * @return the old value of the cell
+         */
+        public Object getOldValue() {
+            return oldValue;
+        }
 
-	/**
-	 *  Get the row that was last edited
-	 *
-	 *  @return the row that was edited
-	 */
-	public int getRow()
-	{
-		return row;
-	}
+        /**
+         * Get the row that was last edited
+         *
+         * @return the row that was edited
+         */
+        public int getRow() {
+            return row;
+        }
 
-	/**
-	 *  Get the table of the cell that was changed
-	 *
-	 *  @return the table of the cell that was changed
-	 */
-	public JTable getTable()
-	{
-		return table;
-	}
+        /**
+         * Get the table of the cell that was changed
+         *
+         * @return the table of the cell that was changed
+         */
+        public JTable getTable() {
+            return table;
+        }
 //
 //  Implement the PropertyChangeListener interface
 //
-	@Override
-	public void propertyChange(PropertyChangeEvent e)
-	{
-		//  A cell has started/stopped editing
 
-		if ("tableCellEditor".equals(e.getPropertyName()))
-		{
-			if (table.isEditing())
-				processEditingStarted();
-			else
-				processEditingStopped();
-		}
-	}
+        @Override
+        public void propertyChange(PropertyChangeEvent e) {
+            //  A cell has started/stopped editing
 
-	/*
+            if ("tableCellEditor".equals(e.getPropertyName())) {
+                if (table.isEditing()) {
+                    processEditingStarted();
+                } else {
+                    processEditingStopped();
+                }
+            }
+        }
+
+        /*
 	 *  Save information of the cell about to be edited
-	 */
-	private void processEditingStarted()
-	{
-		//  The invokeLater is necessary because the editing row and editing
-		//  column of the table have not been set when the "tableCellEditor"
-		//  PropertyChangeEvent is fired.
-		//  This results in the "run" method being invoked
+         */
+        private void processEditingStarted() {
+            //  The invokeLater is necessary because the editing row and editing
+            //  column of the table have not been set when the "tableCellEditor"
+            //  PropertyChangeEvent is fired.
+            //  This results in the "run" method being invoked
 
-		SwingUtilities.invokeLater( this );
-	}
-	/*
+            SwingUtilities.invokeLater(this);
+        }
+
+        /*
 	 *  See above.
-	 */
-	@Override
-	public void run()
-	{
-		row = table.convertRowIndexToModel( table.getEditingRow() );
-		column = table.convertColumnIndexToModel( table.getEditingColumn() );
-		oldValue = table.getModel().getValueAt(row, column);
-		newValue = null;
-	}
+         */
+        @Override
+        public void run() {
+            row = table.convertRowIndexToModel(table.getEditingRow());
+            column = table.convertColumnIndexToModel(table.getEditingColumn());
+            oldValue = table.getModel().getValueAt(row, column);
+            newValue = null;
+        }
 
-	/*
+        /*
 	 *	Update the Cell history when necessary
-	 */
-	private void processEditingStopped()
-	{
-		newValue = table.getModel().getValueAt(row, column);
+         */
+        private void processEditingStopped() {
+            newValue = table.getModel().getValueAt(row, column);
 
-		//  The data has changed, invoke the supplied Action
+            //  The data has changed, invoke the supplied Action
+            if (!newValue.equals(oldValue)) {
+                //  Make a copy of the data in case another cell starts editing
+                //  while processing this change
 
-		if (! newValue.equals(oldValue))
-		{
-			//  Make a copy of the data in case another cell starts editing
-			//  while processing this change
+                TableCellListener tcl = new TableCellListener(
+                        getTable(), getRow(), getColumn(), getOldValue(), getNewValue());
 
-			TableCellListener tcl = new TableCellListener(
-				getTable(), getRow(), getColumn(), getOldValue(), getNewValue());
-
-			ActionEvent event = new ActionEvent(
-				tcl,
-				ActionEvent.ACTION_PERFORMED,
-				"");
-                        String fileOld=saveSelectedNode.toString()+"\\"+oldValue;
-                        String fileNew=saveSelectedNode.toString()+"\\"+newValue;
-                        File fO=new File(fileOld);
-                        File fN=new File(fileNew);
-                        fO.renameTo(fN);
-                        loadTableWhenAction();
-		}
-                isRenameClick=false;
-                isTaoMoiThuMuc=false;
-                isTaoMoiFile=false;
-	}
-}
+                ActionEvent event = new ActionEvent(
+                        tcl,
+                        ActionEvent.ACTION_PERFORMED,
+                        "");
+                String fileOld = saveSelectedNode.toString() + "\\" + oldValue;
+                String fileNew = saveSelectedNode.toString() + "\\" + newValue;
+                File fO = new File(fileOld);
+                File fN = new File(fileNew);
+                fO.renameTo(fN);
+                loadTableWhenAction();
+            }
+            isRenameClick = false;
+            isTaoMoiThuMuc = false;
+            isTaoMoiFile = false;
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -367,6 +364,7 @@ public class MainForm extends javax.swing.JFrame {
         btnDelete = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnExtract = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jToolBar3 = new javax.swing.JToolBar();
         jTextField1 = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
@@ -700,6 +698,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnExtract);
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("jButton1");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton1);
 
         jToolBar3.setBackground(new java.awt.Color(255, 255, 255));
         jToolBar3.setRollover(true);
@@ -1046,560 +1051,480 @@ public class MainForm extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         loadTree();
         loadTable();
-        TableCellListener tcl=new TableCellListener(Table,Tree);
-        Action action = new AbstractAction()
-        {
+        TableCellListener tcl = new TableCellListener(Table, Tree);
+        Action action = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                java.awt.event.ActionEvent newEvt=new java.awt.event.ActionEvent(this,0,"");
+            public void actionPerformed(ActionEvent e) {
+                java.awt.event.ActionEvent newEvt = new java.awt.event.ActionEvent(this, 0, "");
                 btnSearchActionPerformed(newEvt);
             }
         };
-        jTextField1.addActionListener( action );
+        jTextField1.addActionListener(action);
     }//GEN-LAST:event_formWindowOpened
 
 
     private void TreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TreeMouseClicked
-        if(Tree.getLastSelectedPathComponent()==null) return;
-        if(saveSelectedNode!=null && openingInTable==false && !isUp && !isCreatingNode && !isBacking && !isForwarding && !isHidden)
-        {
-            if(saveSelectedNode==(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent())
+        if (Tree.getLastSelectedPathComponent() == null) {
+            return;
+        }
+        if (saveSelectedNode != null && openingInTable == false && !isUp && !isCreatingNode && !isBacking && !isForwarding && !isHidden) {
+            if (saveSelectedNode == (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent()) {
                 return;
+            }
         }
         //<editor-fold defaultstate="collapsed" desc="lấy node được chọn">
 
+        DefaultMutableTreeNode selectedNode = null;
 
-        
-        DefaultMutableTreeNode selectedNode=null;
-
-        if(isForwarding)
-        {
-            if(strForward.equals("ThisPC")) 
-                selectedNode=treeRoot;
-            else
-            {
-                selectedNode=saveSelectedNode;
-                for(int i=0;i<selectedNode.getChildCount();i++)
-                {
-                    DefaultMutableTreeNode tmp=(DefaultMutableTreeNode)selectedNode.getChildAt(i);
-                    String path=(String)tmp.getUserObject();
-                    if(path.equals(strForward)) 
-                    {
-                        selectedNode=tmp;
+        if (isForwarding) {
+            if (strForward.equals("ThisPC")) {
+                selectedNode = treeRoot;
+            } else {
+                selectedNode = saveSelectedNode;
+                for (int i = 0; i < selectedNode.getChildCount(); i++) {
+                    DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) selectedNode.getChildAt(i);
+                    String path = (String) tmp.getUserObject();
+                    if (path.equals(strForward)) {
+                        selectedNode = tmp;
                         break;
-                    }     
+                    }
                 }
             }
-            
+
             selectedNode.removeAllChildren();
-        }
-        else
-        if(isBacking)
-        {
-            if(strBack.equals("ThisPC")) 
-                selectedNode=treeRoot;
-            else
-            {
-                selectedNode=saveSelectedNode;
-                for(int i=0;i<selectedNode.getChildCount();i++)
-                {
-                    DefaultMutableTreeNode tmp=(DefaultMutableTreeNode)selectedNode.getChildAt(i);
-                    String path=(String)tmp.getUserObject();
-                    if(path.equals(strBack)) 
-                    {
-                        selectedNode=tmp;
+        } else if (isBacking) {
+            if (strBack.equals("ThisPC")) {
+                selectedNode = treeRoot;
+            } else {
+                selectedNode = saveSelectedNode;
+                for (int i = 0; i < selectedNode.getChildCount(); i++) {
+                    DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) selectedNode.getChildAt(i);
+                    String path = (String) tmp.getUserObject();
+                    if (path.equals(strBack)) {
+                        selectedNode = tmp;
                         break;
-                    }     
+                    }
                 }
             }
-            
+
             selectedNode.removeAllChildren();
-        }
-        else
-        if(openingInTable)
-        { 
+        } else if (openingInTable) {
             //System.out.println("test"+tableIndex);
-            selectedNode=(DefaultMutableTreeNode)((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).getChildAt(tableIndex);
+            selectedNode = (DefaultMutableTreeNode) ((DefaultMutableTreeNode) Tree.getLastSelectedPathComponent()).getChildAt(tableIndex);
             Tree.expandPath(Tree.getLeadSelectionPath());
-            openingInTable=false;
-        }
-        else 
-            if(isUp)
-            {
-                selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getParent();
-                selectedNode.removeAllChildren();
-                isUp=false;
-            }
-            else
-                if(isCreatingNode)
-                {
-                    if(textAddress.getText().equals("ThisPC"))
-                    {
-                        selectedNode=treeRoot;
+            openingInTable = false;
+        } else if (isUp) {
+            selectedNode = (DefaultMutableTreeNode) saveSelectedNode.getParent();
+            selectedNode.removeAllChildren();
+            isUp = false;
+        } else if (isCreatingNode) {
+            if (textAddress.getText().equals("ThisPC")) {
+                selectedNode = treeRoot;
+            } else {
+                for (int i = 0; i < saveSelectedNode.getChildCount(); i++) {
+                    if (((DefaultMutableTreeNode) saveSelectedNode.getChildAt(i)).getUserObject().equals(strCreateNode)) {
+                        selectedNode = (DefaultMutableTreeNode) saveSelectedNode.getChildAt(i);
                     }
-                    else
-                    {
-                        for(int i=0;i<saveSelectedNode.getChildCount();i++)
-                            if(((DefaultMutableTreeNode)saveSelectedNode.getChildAt(i)).getUserObject().equals(strCreateNode))
-                            {
-                                selectedNode=(DefaultMutableTreeNode)saveSelectedNode.getChildAt(i);
-                            }
-                    }
-                    selectedNode.removeAllChildren();
                 }
-                else
-                    if(isHidden)
-                    {
-                        ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
-                        selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
-                    }
-                    else
-                    {
-                        ((DefaultMutableTreeNode)Tree.getLastSelectedPathComponent()).removeAllChildren();
-                        selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
-                    }
-            
-        //</editor-fold>
-        
-        //duong dan file dang duoc chon
-        String pathStr=(String)selectedNode.getUserObject();
-        java.io.File selectedFile =new File(pathStr);
-        java.io.File[] pathss=selectedFile.listFiles();
-        if(pathStr=="ThisPC") 
-            pathss=java.io.File.listRoots();
-    
-        for(File path:pathss)
-            if(path.isDirectory())
-            {
-                if(!(path.isHidden() && hiddenCheck.getState()==false))
-                    selectedNode.add(new DefaultMutableTreeNode(path.getAbsolutePath()));
             }
-        saveSelectedNode=selectedNode;
-        ShowInTable(pathss,selectedNode);
-        
-        DefaultTreeModel model=(DefaultTreeModel)Tree.getModel();
+            selectedNode.removeAllChildren();
+        } else if (isHidden) {
+            ((DefaultMutableTreeNode) Tree.getLastSelectedPathComponent()).removeAllChildren();
+            selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
+        } else {
+            ((DefaultMutableTreeNode) Tree.getLastSelectedPathComponent()).removeAllChildren();
+            selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
+        }
+
+        //</editor-fold>
+        //duong dan file dang duoc chon
+        String pathStr = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(pathStr);
+        java.io.File[] pathss = selectedFile.listFiles();
+        if (pathStr == "ThisPC") {
+            pathss = java.io.File.listRoots();
+        }
+
+        for (File path : pathss) {
+            if (path.isDirectory()) {
+                if (!(path.isHidden() && hiddenCheck.getState() == false)) {
+                    selectedNode.add(new DefaultMutableTreeNode(path.getAbsolutePath()));
+                }
+            }
+        }
+        saveSelectedNode = selectedNode;
+        ShowInTable(pathss, selectedNode);
+
+        DefaultTreeModel model = (DefaultTreeModel) Tree.getModel();
         model.reload(selectedNode);
-        
+
         Tree.setSelectionPath(new TreePath(selectedNode.getPath()));
         Tree.expandRow(selectedNode.getIndex(selectedNode));
         //Tree.expandPath(new TreePath(selectedNode.getPath()));
-        textAddress.setText((String)selectedNode.getUserObject());
-        
-        if(index==-1 || (!saveNode.get(index).equals((String)saveSelectedNode.getUserObject())))
-        {
-            if(!isCreatingNode && !isBacking && !isForwarding)
-            {
-                int count=saveNode.size();
-                for(int i=index+1;i<=count-1;i++)
+        textAddress.setText((String) selectedNode.getUserObject());
+
+        if (index == -1 || (!saveNode.get(index).equals((String) saveSelectedNode.getUserObject()))) {
+            if (!isCreatingNode && !isBacking && !isForwarding) {
+                int count = saveNode.size();
+                for (int i = index + 1; i <= count - 1; i++) {
                     saveNode.remove(i);
-                saveNode.add((String)saveSelectedNode.getUserObject());
+                }
+                saveNode.add((String) saveSelectedNode.getUserObject());
                 index++;
             }
-            
+
         }
-        
-        if(saveSelectedNode.toString().equals("ThisPC")) itemRename.setEnabled(false);
-        else itemRename.setEnabled(true);
+
+        if (saveSelectedNode.toString().equals("ThisPC"))
+            itemRename.setEnabled(false);
+        else
+            itemRename.setEnabled(true);
     }//GEN-LAST:event_TreeMouseClicked
 
-    private void pasteAction(){
-         if(copy)
-         {  
-            for(int k =0; k<ArrCoppyFile.length;k++){
-            fileCoppyPath = ArrCoppyFile[k];
-            System.out.println("cOPPY"+fileCoppyPath.toString());
-            String tmpName = new String();
-            int fileExist = 1;
-            String pasteS = saveSelectedNode.toString();
-            tmpS = pasteS.split("\\\\");
-            String tmp = new String();
-            String tmpE = new String();
-            for (int i=0;i<tmpS.length;i++)
-            {
-                tmp += tmpS[i] + "\\\\" ;
-            }
-            tmp+=tmpF[k];
-            tmpE = tmp;
-            System.out.println(tmp+"tmpS");
-            filePatsePath = new File(tmp);
-            File fEx = new File(tmpE);
-            while(fEx.exists()&&fEx.isFile())
-            {
-                System.out.println("in while"+fileCoppyPath.toString());
-                System.out.println(filePatsePath.toString());
-                tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
-                System.out.println("check"+ tmpName);
-                fEx = new File(tmpName);
-                fileExist +=1;
-            }
-             while(fEx.exists()&&fEx.isDirectory())
-            {
-                System.out.println("in while"+fileCoppyPath.toString());
-                System.out.println(filePatsePath.toString());
-                tmpName = tmp.split("\\.")[0] + "("+fileExist+")";
-                System.out.println("check"+ tmpName);
-                fEx = new File(tmpName);
-                fileExist +=1;
-            }
-             if(fileCoppyPath.isFile()){
-                 try{
-                     FileUtils.copyFile(fileCoppyPath, fEx); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+    private void pasteAction() {
+        if (copy) {
+            for (int k = 0; k < ArrCoppyFile.length; k++) {
+                fileCoppyPath = ArrCoppyFile[k];
+                System.out.println("cOPPY" + fileCoppyPath.toString());
+                String tmpName = new String();
+                int fileExist = 1;
+                String pasteS = saveSelectedNode.toString();
+                tmpS = pasteS.split("\\\\");
+                String tmp = new String();
+                String tmpE = new String();
+                for (int i = 0; i < tmpS.length; i++) {
+                    tmp += tmpS[i] + "\\\\";
+                }
+                tmp += tmpF[k];
+                tmpE = tmp;
+                System.out.println(tmp + "tmpS");
+                filePatsePath = new File(tmp);
+                File fEx = new File(tmpE);
+                while (fEx.exists() && fEx.isFile()) {
+                    System.out.println("in while" + fileCoppyPath.toString());
+                    System.out.println(filePatsePath.toString());
+                    tmpName = tmp.split("\\.")[0] + "(" + fileExist + ")." + tmp.split("\\.")[1];
+                    System.out.println("check" + tmpName);
+                    fEx = new File(tmpName);
+                    fileExist += 1;
+                }
+                while (fEx.exists() && fEx.isDirectory()) {
+                    System.out.println("in while" + fileCoppyPath.toString());
+                    System.out.println(filePatsePath.toString());
+                    tmpName = tmp.split("\\.")[0] + "(" + fileExist + ")";
+                    System.out.println("check" + tmpName);
+                    fEx = new File(tmpName);
+                    fileExist += 1;
+                }
+                if (fileCoppyPath.isFile()) {
+                    try {
+                        FileUtils.copyFile(fileCoppyPath, fEx);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-             }
-             else if(fileCoppyPath.isDirectory()){
-                 try{
-                     FileUtils.copyDirectory(fileCoppyPath, fEx); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+                } else if (fileCoppyPath.isDirectory()) {
+                    try {
+                        FileUtils.copyDirectory(fileCoppyPath, fEx);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-             }
-            
-         }
-         }
-         if(cut)
-         {
-            for(int k =0; k<ArrCoppyFile.length;k++){
-            fileCoppyPath = ArrCoppyFile[k];
-            String tmpName = new String();
-            int fileExist = 1;
-            String stringClipboard = "..\\clipboard\\"+tmpF[k];
-            File Clipboard = new File(stringClipboard);
-            String pasteS = saveSelectedNode.toString();
-            tmpS = pasteS.split("\\\\");
-            String tmp = new String();
-            String tmpE = new String();
-            for (int i=0;i<tmpS.length;i++)
-            {
-                tmp += tmpS[i] + "\\\\" ;
+                }
+
             }
-             tmp+=tmpF[k];
-            tmpE = tmp;
-            System.out.println(tmp);
-            filePatsePath = new File(tmp);
-            File fEx = new File(tmpE);
-            while(fEx.exists()&&fEx.isFile())
-            {
-                System.out.println("in while"+fileCoppyPath.toString());
-                System.out.println(filePatsePath.toString());
-                tmpName = tmp.split("\\.")[0] + "("+fileExist+")." +tmp.split("\\.")[1];
-                System.out.println("check"+ tmpName);
-                fEx = new File(tmpName);
-                fileExist +=1;
-            }
-             while(fEx.exists()&&fEx.isDirectory())
-            {
-                System.out.println("in while"+fileCoppyPath.toString());
-                System.out.println(filePatsePath.toString());
-                tmpName = tmp.split("\\.")[0] + "("+fileExist+")";
-                System.out.println("check"+ tmpName);
-                fEx = new File(tmpName);
-                fileExist +=1;
-            }
-            System.out.println(Clipboard.toString());
-            if(Clipboard.isFile()){
-                 try{
-                     FileUtils.copyFile(Clipboard, fEx); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+        }
+        if (cut) {
+            for (int k = 0; k < ArrCoppyFile.length; k++) {
+                fileCoppyPath = ArrCoppyFile[k];
+                String tmpName = new String();
+                int fileExist = 1;
+                String stringClipboard = "..\\clipboard\\" + tmpF[k];
+                File Clipboard = new File(stringClipboard);
+                String pasteS = saveSelectedNode.toString();
+                tmpS = pasteS.split("\\\\");
+                String tmp = new String();
+                String tmpE = new String();
+                for (int i = 0; i < tmpS.length; i++) {
+                    tmp += tmpS[i] + "\\\\";
+                }
+                tmp += tmpF[k];
+                tmpE = tmp;
+                System.out.println(tmp);
+                filePatsePath = new File(tmp);
+                File fEx = new File(tmpE);
+                while (fEx.exists() && fEx.isFile()) {
+                    System.out.println("in while" + fileCoppyPath.toString());
+                    System.out.println(filePatsePath.toString());
+                    tmpName = tmp.split("\\.")[0] + "(" + fileExist + ")." + tmp.split("\\.")[1];
+                    System.out.println("check" + tmpName);
+                    fEx = new File(tmpName);
+                    fileExist += 1;
+                }
+                while (fEx.exists() && fEx.isDirectory()) {
+                    System.out.println("in while" + fileCoppyPath.toString());
+                    System.out.println(filePatsePath.toString());
+                    tmpName = tmp.split("\\.")[0] + "(" + fileExist + ")";
+                    System.out.println("check" + tmpName);
+                    fEx = new File(tmpName);
+                    fileExist += 1;
+                }
+                System.out.println(Clipboard.toString());
+                if (Clipboard.isFile()) {
+                    try {
+                        FileUtils.copyFile(Clipboard, fEx);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
                     Clipboard.delete();
-            }
-            else if(Clipboard.isDirectory()){
-                 try{
-                     FileUtils.copyDirectory(Clipboard, fEx); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+                } else if (Clipboard.isDirectory()) {
+                    try {
+                        FileUtils.copyDirectory(Clipboard, fEx);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-                 try{
-                     FileUtils.deleteDirectory(Clipboard);
-                 }
-                 catch (IOException e)
-                 {
-                   System.out.println("Nope");   
-                 }
-            } 
+                    try {
+                        FileUtils.deleteDirectory(Clipboard);
+                    } catch (IOException e) {
+                        System.out.println("Nope");
+                    }
+                }
             }
-             cut = false;
-         }
-    checkChoose();
+            cut = false;
+        }
+        checkChoose();
     }
-    
+
     private void btnPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPasteActionPerformed
         // TODO add your handling code here:
         pasteAction();
     }//GEN-LAST:event_btnPasteActionPerformed
 
-    private void loadTableWhenAction(){
-        String str=(String)saveSelectedNode.getUserObject();
-        java.io.File selectedFile =new File(str);
-        java.io.File[] paths=selectedFile.listFiles();
-        
-        try{
+    private void loadTableWhenAction() {
+        String str = (String) saveSelectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
+        java.io.File[] paths = selectedFile.listFiles();
+
+        try {
             saveSelectedNode.removeAllChildren();
-            File []fs=selectedFile.listFiles();
-            for(int i=0;i<fs.length;i++)
-                if(fs[i].isDirectory())
-                {
-                    if(!(fs[i].isHidden() && hiddenCheck.getState()==false))
+            File[] fs = selectedFile.listFiles();
+            for (int i = 0; i < fs.length; i++) {
+                if (fs[i].isDirectory()) {
+                    if (!(fs[i].isHidden() && hiddenCheck.getState() == false)) {
                         saveSelectedNode.add(new DefaultMutableTreeNode(fs[i].getPath()));
+                    }
                 }
-            DefaultTreeModel model = (DefaultTreeModel)Tree.getModel();
+            }
+            DefaultTreeModel model = (DefaultTreeModel) Tree.getModel();
 
             model.reload(saveSelectedNode);
+        } catch (Exception ex) {
+
         }
-        catch(Exception ex){
-            
-        }
-        
-        ShowInTable(paths,saveSelectedNode);
+
+        ShowInTable(paths, saveSelectedNode);
     }
-    
-    private void CoppyAction(){
-         if(cut)
-         {
-            for(int k =0; k<ArrCoppyFile.length;k++){
-            String stringClipboard = "..\\clipboard\\"+tmpF[k];
-            File Clipboard = new File(stringClipboard);
-            fileCoppyPath = ArrCoppyFile[k];
-            System.out.println(Clipboard.toString());
-            System.out.println(fileCoppyPath.toString());
-            
-            if(Clipboard.isFile()){
-                 try{
-                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+
+    private void CoppyAction() {
+        if (cut) {
+            for (int k = 0; k < ArrCoppyFile.length; k++) {
+                String stringClipboard = "..\\clipboard\\" + tmpF[k];
+                File Clipboard = new File(stringClipboard);
+                fileCoppyPath = ArrCoppyFile[k];
+                System.out.println(Clipboard.toString());
+                System.out.println(fileCoppyPath.toString());
+
+                if (Clipboard.isFile()) {
+                    try {
+                        FileUtils.copyFile(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
                     Clipboard.delete();
-            }
-            else if(Clipboard.isDirectory()){
-                 try{
-                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+                } else if (Clipboard.isDirectory()) {
+                    try {
+                        FileUtils.copyDirectory(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-                 try{
-                     FileUtils.deleteDirectory(Clipboard);
-                 }
-                 catch (IOException e)
-                 {
-                   System.out.println("Nope");   
-                 }
-            } 
+                    try {
+                        FileUtils.deleteDirectory(Clipboard);
+                    } catch (IOException e) {
+                        System.out.println("Nope");
+                    }
+                }
             }
-             cut = false;
-         }
-         //lấy node được chọn
-        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+            cut = false;
+        }
+        //lấy node được chọn
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
         //selectedNode.removeAllChildren();
-      
-        String str=(String)selectedNode.getUserObject();
-        java.io.File selectedFile =new File(str);
+
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
         java.io.File[] pathfirst = selectedFile.listFiles();
-        int length=pathfirst.length;
-        int dem=0;
-        
+        int length = pathfirst.length;
+        int dem = 0;
+
         paths = new File[length];
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory())
-            {
-                 paths[dem]=pathfirst[i];
-                 dem++;
-            }   
-        }
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory()==false)
-            {
-                paths[dem]=pathfirst[i];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
                 dem++;
-            }       
+            }
         }
-        
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
         int[] SelectedRowIndex = Table.getSelectedRows();
         ArrCoppyFile = new File[SelectedRowIndex.length];
         tmpF = new String[SelectedRowIndex.length];
-        for (int i = 0; i < SelectedRowIndex.length; i++)
-        {
+        for (int i = 0; i < SelectedRowIndex.length; i++) {
             fileCoppyPath = paths[SelectedRowIndex[i]];
             System.out.println(fileCoppyPath.toString());
             tmpS = fileCoppyPath.toString().split("\\\\");
             String tmp = new String();
-            for (int j=0;j<tmpS.length-1;j++)
-            {
-                tmp += tmpS[j] + "\\\\" ;
+            for (int j = 0; j < tmpS.length - 1; j++) {
+                tmp += tmpS[j] + "\\\\";
             }
-            tmpF[i]=tmpS[tmpS.length-1];
-            tmp+=tmpF[i];
-            System.out.println("new file in coppy!!  "+tmp);
+            tmpF[i] = tmpS[tmpS.length - 1];
+            tmp += tmpF[i];
+            System.out.println("new file in coppy!!  " + tmp);
             fileCoppyPath = new File(tmp);
-            ArrCoppyFile[i] = fileCoppyPath ;
+            ArrCoppyFile[i] = fileCoppyPath;
         }
         copy = true;
         cut = false;
         checkChoose();
     }
-    
+
     private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-        CoppyAction(); 
+        CoppyAction();
     }//GEN-LAST:event_btnCopyActionPerformed
 
-    private void cutAction(){
-        if(cut)
-         {
-            for(int k =0; k<ArrCoppyFile.length;k++){
-            String stringClipboard = "..\\clipboard\\"+tmpF[k];
-            File Clipboard = new File(stringClipboard);
-            fileCoppyPath = ArrCoppyFile[k];
-            System.out.println(Clipboard.toString());
-            System.out.println(fileCoppyPath.toString());
-            if(Clipboard.isFile()){
-                 try{
-                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+    private void cutAction() {
+        if (cut) {
+            for (int k = 0; k < ArrCoppyFile.length; k++) {
+                String stringClipboard = "..\\clipboard\\" + tmpF[k];
+                File Clipboard = new File(stringClipboard);
+                fileCoppyPath = ArrCoppyFile[k];
+                System.out.println(Clipboard.toString());
+                System.out.println(fileCoppyPath.toString());
+                if (Clipboard.isFile()) {
+                    try {
+                        FileUtils.copyFile(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
                     Clipboard.delete();
-            }
-            else if(Clipboard.isDirectory()){
-                 try{
-                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+                } else if (Clipboard.isDirectory()) {
+                    try {
+                        FileUtils.copyDirectory(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-                 try{
-                     FileUtils.deleteDirectory(Clipboard);
-                 }
-                 catch (IOException e)
-                 {
-                   System.out.println("Nope");   
-                 }
-            } 
+                    try {
+                        FileUtils.deleteDirectory(Clipboard);
+                    } catch (IOException e) {
+                        System.out.println("Nope");
+                    }
+                }
             }
-             cut = false;
-         }
-        
-         //lấy node được chọn
-        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+            cut = false;
+        }
+
+        //lấy node được chọn
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
         selectedNode.removeAllChildren();
-      
-        String str=(String)selectedNode.getUserObject();
-        java.io.File selectedFile =new File(str);
-        File[] pathfirst=selectedFile.listFiles();
-        int dem=0;
-        int length=pathfirst.length;
+
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
+        File[] pathfirst = selectedFile.listFiles();
+        int dem = 0;
+        int length = pathfirst.length;
         java.io.File[] paths = new File[length];
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory())
-            {
-                 paths[dem]=pathfirst[i];
-                 dem++;
-            }
-               
-            
-        }
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory()==false)
-            {
-                paths[dem]=pathfirst[i];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
                 dem++;
             }
-                
+
         }
-        
-        
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+
+        }
+
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
-        
-        
+
         //New line 
         int[] SelectedRowIndex = Table.getSelectedRows();
         ArrCoppyFile = new File[SelectedRowIndex.length];
         tmpF = new String[SelectedRowIndex.length];
-        for (int i = 0; i < SelectedRowIndex.length; i++)
-        {
-        
-        //file
-        fileCoppyPath = paths[SelectedRowIndex[i]];
-        System.out.println(fileCoppyPath.toString());
-         
-        
-        tmpS = fileCoppyPath.toString().split("\\\\");
-        String tmp = new String();
-        for (int j=0;j<tmpS.length-1;j++)
-        {
-            tmp += tmpS[j] + "\\\\" ;
-        }
-        tmpF[i]=tmpS[tmpS.length-1];
-        tmp+=tmpF[i];
-        System.out.println(tmp);
-        fileCoppyPath = new File(tmp);
-        ArrCoppyFile[i] = fileCoppyPath ;
-        String stringClipboard = "..\\clipboard\\"+tmpF[i];
+        for (int i = 0; i < SelectedRowIndex.length; i++) {
+
+            //file
+            fileCoppyPath = paths[SelectedRowIndex[i]];
+            System.out.println(fileCoppyPath.toString());
+
+            tmpS = fileCoppyPath.toString().split("\\\\");
+            String tmp = new String();
+            for (int j = 0; j < tmpS.length - 1; j++) {
+                tmp += tmpS[j] + "\\\\";
+            }
+            tmpF[i] = tmpS[tmpS.length - 1];
+            tmp += tmpF[i];
+            System.out.println(tmp);
+            fileCoppyPath = new File(tmp);
+            ArrCoppyFile[i] = fileCoppyPath;
+            String stringClipboard = "..\\clipboard\\" + tmpF[i];
             File Clipboard = new File(stringClipboard);
-        if(fileCoppyPath.isFile())
-        {
+            if (fileCoppyPath.isFile()) {
 
-            try{
-                FileUtils.copyFile(fileCoppyPath, Clipboard);
-            }
-            catch (IOException e)
-            {
-                //Nope
-            }
-            fileCoppyPath.delete();
-            loadTableWhenAction();
-        }
-        else if(fileCoppyPath.isDirectory())
-        {
+                try {
+                    FileUtils.copyFile(fileCoppyPath, Clipboard);
+                } catch (IOException e) {
+                    //Nope
+                }
+                fileCoppyPath.delete();
+                loadTableWhenAction();
+            } else if (fileCoppyPath.isDirectory()) {
 
-            try{
-                FileUtils.copyDirectory(fileCoppyPath, Clipboard);
+                try {
+                    FileUtils.copyDirectory(fileCoppyPath, Clipboard);
+                } catch (IOException e) {
+                    //Nope
+                }
+                try {
+                    FileUtils.deleteDirectory(fileCoppyPath);
+                    loadTableWhenAction();
+                } catch (IOException e) {
+                    //Nope
+                }
             }
-            catch (IOException e)
-            {
-                //Nope
-            }
-             try{
-                 FileUtils.deleteDirectory(fileCoppyPath);
-                 loadTableWhenAction();
-            }
-            catch (IOException e)
-            {
-                //Nope
-            }
-        }
         }
         copy = false;
         cut = true;
         checkChoose();
     }
-    
-    
+
+
     private void btnCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCutActionPerformed
         // TODO add your handling code here:
         cutAction();
@@ -1609,344 +1534,307 @@ public class MainForm extends javax.swing.JFrame {
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
         // TODO add your handling code here:
         jScrollPane2.requestFocus();
-        JTable source = (JTable)evt.getSource();
-        if ((evt.getClickCount() == 2 || isOpen) && source.getSelectedRow() != -1)
-        {
-            
-            isOpen=false;
-            int row = source.rowAtPoint( evt.getPoint() );
-            int column = source.columnAtPoint( evt.getPoint() );
-            
+        JTable source = (JTable) evt.getSource();
+        if ((evt.getClickCount() == 2 || isOpen) && source.getSelectedRow() != -1) {
+
+            isOpen = false;
+            int row = source.rowAtPoint(evt.getPoint());
+            int column = source.columnAtPoint(evt.getPoint());
+
             String str;//=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
-            str=(String)source.getModel().getValueAt(row, 0);
-            if(isSearching)
-            {
-                System.out.println((String)source.getModel().getValueAt(row, 4));
-                str=(String)source.getModel().getValueAt(row, 4);
+            str = (String) source.getModel().getValueAt(row, 0);
+            if (isSearching) {
+                System.out.println((String) source.getModel().getValueAt(row, 4));
+                str = (String) source.getModel().getValueAt(row, 4);
             }
-            File s=new File(str);
+            File s = new File(str);
             Desktop desktop = Desktop.getDesktop();
-            try{
-                if(s.exists() && s.isFile()) 
-                {
+            try {
+                if (s.exists() && s.isFile()) {
                     desktop.open(s);
-                }
-                else
-                {
-                    if(isSearching)
-                    {
+                } else {
+                    if (isSearching) {
                         textAddress.setText(str);
                         btnGotoMouseClicked(evt);
-                    }
-                    else
-                    {
-                        DefaultTableModel tableModel=(DefaultTableModel) Table.getModel();
-                        paths=s.listFiles();
-                        openingInTable=true;
-                        tableIndex=row;
+                    } else {
+                        DefaultTableModel tableModel = (DefaultTableModel) Table.getModel();
+                        paths = s.listFiles();
+                        openingInTable = true;
+                        tableIndex = row;
                         TreeMouseClicked(evt);
                     }
-                    
+
                 }
+            } catch (Exception ex) {
             }
-                    
-            catch(Exception ex)
-            {
-            }
-            
-            if(isSearching)
-            {
+
+            if (isSearching) {
                 //duong dan file dang duoc chon
-                String pathStr=(String)saveSelectedNode.getUserObject();
-                java.io.File selectedFile =new File(pathStr);
-                java.io.File[] pathss=selectedFile.listFiles();
-                
-                ShowInTable(pathss,saveSelectedNode);
-                isSearching=false;
+                String pathStr = (String) saveSelectedNode.getUserObject();
+                java.io.File selectedFile = new File(pathStr);
+                java.io.File[] pathss = selectedFile.listFiles();
+
+                ShowInTable(pathss, saveSelectedNode);
+                isSearching = false;
             }
         }
-        
+
     }//GEN-LAST:event_TableMouseClicked
 
-  //<editor-fold defaultstate="collapsed" desc="COPY, CUT, PASTE, BACK, rename, exit,refresh,..">
+    //<editor-fold defaultstate="collapsed" desc="COPY, CUT, PASTE, BACK, rename, exit,refresh,..">
     private void itemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAboutActionPerformed
         // TODO add your handling code here:
-        AboutForm aboutForm=new AboutForm();
+        AboutForm aboutForm = new AboutForm();
         aboutForm.setLocation(this.getLocation());
         aboutForm.setVisible(true);
     }//GEN-LAST:event_itemAboutActionPerformed
 
     private void btnUpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnUpMouseClicked
         // TODO add your handling code here:
-        if(saveSelectedNode.toString()=="ThisPC") return;
-        isUp=true;
+        if (saveSelectedNode.toString() == "ThisPC") {
+            return;
+        }
+        isUp = true;
         TreeMouseClicked(evt);
     }//GEN-LAST:event_btnUpMouseClicked
 
     private void btnGotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGotoMouseClicked
         // TODO add your handling code here:
         //Node được chọn là ThisPC
-        if(textAddress.getText().equals("ThisPC"))
-        {
-            isGotoAddress=true;
+        if (textAddress.getText().equals("ThisPC")) {
+            isGotoAddress = true;
             TreeMouseClicked(evt);
             return;
         }
-        
+
         //Tách ThisPC ra khỏi chuỗi:
-        String[] temp=textAddress.getText().split("\\\\");
-        if(temp[0].equals("ThisPC"))
-        {
-            String tmp=textAddress.getText().substring(7, textAddress.getText().length());
+        String[] temp = textAddress.getText().split("\\\\");
+        if (temp[0].equals("ThisPC")) {
+            String tmp = textAddress.getText().substring(7, textAddress.getText().length());
             textAddress.setText(tmp);
-            temp=textAddress.getText().split("\\\\");
+            temp = textAddress.getText().split("\\\\");
         }
-        
+
         File f = new File(textAddress.getText());
         if (f.exists() && f.isDirectory()) {
             //Tạo node theo address cho tree
-            isCreatingNode=true;
-            strCreateNode="";
-            saveSelectedNode=treeRoot;
-            for(int i=0;i<temp.length;i++)
-            {
-                if(i==0) strCreateNode+=temp[i]+"\\";
-                else 
-                    if(i==1) strCreateNode+=temp[i];
-                    else
-                        strCreateNode+="\\"+temp[i];
-                
+            isCreatingNode = true;
+            strCreateNode = "";
+            saveSelectedNode = treeRoot;
+            for (int i = 0; i < temp.length; i++) {
+                if (i == 0) {
+                    strCreateNode += temp[i] + "\\";
+                } else if (i == 1) {
+                    strCreateNode += temp[i];
+                } else {
+                    strCreateNode += "\\" + temp[i];
+                }
+
                 TreeMouseClicked(evt);
             }
-            if(!saveNode.get(index).equals((String)saveSelectedNode.getUserObject()))
-            {
-                for(int i=index+1;i<saveNode.size()-1;i++)
+            if (!saveNode.get(index).equals((String) saveSelectedNode.getUserObject())) {
+                for (int i = index + 1; i < saveNode.size() - 1; i++) {
                     saveNode.remove(i);
-                saveNode.add((String)saveSelectedNode.getUserObject());
+                }
+                saveNode.add((String) saveSelectedNode.getUserObject());
                 index++;
             }
-            
-            isCreatingNode=false;
-            
-        }
-        else
-        {
+
+            isCreatingNode = false;
+
+        } else {
             JOptionPane.showMessageDialog(this,
-                                  "Please type the address again!",
-                                  "Wrong address",
-                                  JOptionPane.WARNING_MESSAGE);
+                    "Please type the address again!",
+                    "Wrong address",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnGotoMouseClicked
 
     private void btnBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBackMouseClicked
         // TODO add your handling code here:
-        try
-        {
-            if(index==-1) 
-            return;
-            if(index==0)
-            {
-                index--;
-                isBacking=true;
-                strBack="ThisPC";
-                TreeMouseClicked(evt);
-                isBacking=false;
+        try {
+            if (index == -1) {
                 return;
             }
-            isBacking=true;
-            index--;
-            String[] temp=saveNode.get(index).split("\\\\");
-            strBack="";
-            saveSelectedNode=treeRoot;
-            for(int i=0;i<temp.length;i++)
-            {
-                if(i==0) strBack+=temp[i]+"\\";
-                else 
-                    if(i==1) strBack+=temp[i];
-                    else
-                        strBack+="\\"+temp[i];
+            if (index == 0) {
+                index--;
+                isBacking = true;
+                strBack = "ThisPC";
                 TreeMouseClicked(evt);
-            }        
+                isBacking = false;
+                return;
+            }
+            isBacking = true;
+            index--;
+            String[] temp = saveNode.get(index).split("\\\\");
+            strBack = "";
+            saveSelectedNode = treeRoot;
+            for (int i = 0; i < temp.length; i++) {
+                if (i == 0) {
+                    strBack += temp[i] + "\\";
+                } else if (i == 1) {
+                    strBack += temp[i];
+                } else {
+                    strBack += "\\" + temp[i];
+                }
+                TreeMouseClicked(evt);
+            }
 
+            isBacking = false;
+        } catch (Exception e) {
 
-
-            isBacking=false;
         }
-        catch (Exception e)
-        {
-            
-        }
-        
-        
+
+
     }//GEN-LAST:event_btnBackMouseClicked
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent(); 
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
         selectedNode.removeAllChildren();
-        saveSelectedNode=selectedNode;
-        String str=(String)selectedNode.getUserObject();
-        java.io.File selectedFile =new File(str);
-        File[] pathfirst=selectedFile.listFiles();
-        int dem=0;
-        int length=pathfirst.length;
+        saveSelectedNode = selectedNode;
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
+        File[] pathfirst = selectedFile.listFiles();
+        int dem = 0;
+        int length = pathfirst.length;
         paths = new File[length];
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory())
-            {
-                 paths[dem]=pathfirst[i];
-                 dem++;
-            }   
-        }
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory()==false)
-            {
-                paths[dem]=pathfirst[i];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
                 dem++;
-            }       
+            }
         }
-        
-        
-       DefaultTableModel model = (DefaultTableModel) Table.getModel();
-        
-        
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+
         //New line 
         int[] SelectedRowIndex = Table.getSelectedRows();
         ArrCoppyFile = new File[SelectedRowIndex.length];
         tmpF = new String[SelectedRowIndex.length];
-        if(SelectedRowIndex.length!=0)
-        {
-            int ck=JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa file này?", "Cảnh báo!", JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
-            if (ck==1) return;
-        }
-        for (int i = 0; i < SelectedRowIndex.length; i++)
-        {
-        
-        //file
-        fileCoppyPath = paths[SelectedRowIndex[i]];
-        System.out.println(fileCoppyPath.toString());
-         
-        
-        tmpS = fileCoppyPath.toString().split("\\\\");
-        String tmp = new String();
-        for (int j=0;j<tmpS.length-1;j++)
-        {
-            tmp += tmpS[j] + "\\\\" ;
-        }
-        tmpF[i]=tmpS[tmpS.length-1];
-        tmp+=tmpF[i];
-        System.out.println(tmp);
-        fileCoppyPath = new File(tmp);
-        ArrCoppyFile[i] = fileCoppyPath ;
-        if(fileCoppyPath.isFile())
-        {
-
-          
-            fileCoppyPath.delete();
-            loadTableWhenAction();
-        }
-        else if(fileCoppyPath.isDirectory())
-        {
-
-             try{
-                 FileUtils.deleteDirectory(fileCoppyPath);
-                 loadTableWhenAction();
-            }
-            catch (IOException e)
-            {
-                //Nope
+        if (SelectedRowIndex.length != 0) {
+            int ck = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa file này?", "Cảnh báo!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            if (ck == 1) {
+                return;
             }
         }
+        for (int i = 0; i < SelectedRowIndex.length; i++) {
+
+            //file
+            fileCoppyPath = paths[SelectedRowIndex[i]];
+            System.out.println(fileCoppyPath.toString());
+
+            tmpS = fileCoppyPath.toString().split("\\\\");
+            String tmp = new String();
+            for (int j = 0; j < tmpS.length - 1; j++) {
+                tmp += tmpS[j] + "\\\\";
+            }
+            tmpF[i] = tmpS[tmpS.length - 1];
+            tmp += tmpF[i];
+            System.out.println(tmp);
+            fileCoppyPath = new File(tmp);
+            ArrCoppyFile[i] = fileCoppyPath;
+            if (fileCoppyPath.isFile()) {
+
+                fileCoppyPath.delete();
+                loadTableWhenAction();
+            } else if (fileCoppyPath.isDirectory()) {
+
+                try {
+                    FileUtils.deleteDirectory(fileCoppyPath);
+                    loadTableWhenAction();
+                } catch (IOException e) {
+                    //Nope
+                }
+            }
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-       if(cut)
-         {
-            for(int k =0; k<ArrCoppyFile.length;k++){
-            fileCoppyPath = ArrCoppyFile[k];
-            String stringClipboard = "..\\clipboard\\"+tmpF[k];
-            File Clipboard = new File(stringClipboard);
-            System.out.println(Clipboard.toString());
-            System.out.println(fileCoppyPath.toString());
-            if(Clipboard.isFile()){
-                 try{
-                     FileUtils.copyFile(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+        if (cut) {
+            for (int k = 0; k < ArrCoppyFile.length; k++) {
+                fileCoppyPath = ArrCoppyFile[k];
+                String stringClipboard = "..\\clipboard\\" + tmpF[k];
+                File Clipboard = new File(stringClipboard);
+                System.out.println(Clipboard.toString());
+                System.out.println(fileCoppyPath.toString());
+                if (Clipboard.isFile()) {
+                    try {
+                        FileUtils.copyFile(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
                     Clipboard.delete();
-            }
-            else if(Clipboard.isDirectory()){
-                 try{
-                     FileUtils.copyDirectory(Clipboard, fileCoppyPath); 
-                     loadTableWhenAction();
-                    }  
-                 catch (IOException e){
-                         System.out.println("Nope");
+                } else if (Clipboard.isDirectory()) {
+                    try {
+                        FileUtils.copyDirectory(Clipboard, fileCoppyPath);
+                        loadTableWhenAction();
+                    } catch (IOException e) {
+                        System.out.println("Nope");
                     }
-                 try{
-                     FileUtils.deleteDirectory(Clipboard);
-                 }
-                 catch (IOException e)
-                 {
-                   System.out.println("Nope");   
-                 }
-            } 
+                    try {
+                        FileUtils.deleteDirectory(Clipboard);
+                    } catch (IOException e) {
+                        System.out.println("Nope");
+                    }
+                }
             }
-             cut = false;
-         }
+            cut = false;
+        }
     }//GEN-LAST:event_formWindowClosing
 
     private void btnForwardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnForwardMouseClicked
         // TODO add your handling code here:
-        if(index+1==saveNode.size()) return;
+        if (index + 1 == saveNode.size()) {
+            return;
+        }
         index++;
-        isForwarding=true;
-        String[] temp=saveNode.get(index).split("\\\\");
-        strForward="";
-        saveSelectedNode=treeRoot;
-        for(int i=0;i<temp.length;i++)
-        {
-            if(i==0) strForward+=temp[i]+"\\";
-            else 
-                if(i==1) strForward+=temp[i];
-                else
-                    strForward+="\\"+temp[i];
+        isForwarding = true;
+        String[] temp = saveNode.get(index).split("\\\\");
+        strForward = "";
+        saveSelectedNode = treeRoot;
+        for (int i = 0; i < temp.length; i++) {
+            if (i == 0) {
+                strForward += temp[i] + "\\";
+            } else if (i == 1) {
+                strForward += temp[i];
+            } else {
+                strForward += "\\" + temp[i];
+            }
             TreeMouseClicked(evt);
-        }     
-        
-        isForwarding=false;
+        }
+
+        isForwarding = false;
     }//GEN-LAST:event_btnForwardMouseClicked
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_formWindowClosed
 
     private void itemSellectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSellectAllActionPerformed
         // TODO add your handling code here:
-        if(!isSelectAll)
-        {
-            isSelectAll=true;
+        if (!isSelectAll) {
+            isSelectAll = true;
             Table.selectAll();
-        }
-        else
-        {
+        } else {
             Table.clearSelection();
-            isSelectAll=false;
+            isSelectAll = false;
         }
-        
+
     }//GEN-LAST:event_itemSellectAllActionPerformed
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-      
-    
+
+
     }//GEN-LAST:event_formKeyPressed
 
     private void TableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TableKeyPressed
@@ -1955,24 +1843,21 @@ public class MainForm extends javax.swing.JFrame {
 
     private void TreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TreeKeyPressed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_TreeKeyPressed
 
-    private void checkChoose()
-    {
-        if(copy)
-        {
+    private void checkChoose() {
+        if (copy) {
             btnCopy.setForeground(Color.BLUE);
         }
-        if(cut)
-        {
+        if (cut) {
             btnCut.setForeground(Color.BLUE);
         }
-        if(!copy) {
-             btnCopy.setForeground(Color.BLACK);
+        if (!copy) {
+            btnCopy.setForeground(Color.BLACK);
         }
-         if(!cut) {
-             btnCut.setForeground(Color.BLACK);
+        if (!cut) {
+            btnCut.setForeground(Color.BLACK);
         }
     }
 
@@ -1984,69 +1869,64 @@ public class MainForm extends javax.swing.JFrame {
 
     private void jScrollPane2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jScrollPane2KeyPressed
         // TODO add your handling code here:
-        if ((evt.getKeyCode() == KeyEvent.VK_A)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-                  if(!isSelectAll)
-                    {
-                        isSelectAll=true;
-                        Table.selectAll();
-                    }
-                    else
-                    {
-                        Table.clearSelection();
-                        isSelectAll=false;
-                    }
+        if ((evt.getKeyCode() == KeyEvent.VK_A) && ((evt.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
+            if (!isSelectAll) {
+                isSelectAll = true;
+                Table.selectAll();
+            } else {
+                Table.clearSelection();
+                isSelectAll = false;
+            }
         }
-        if ((evt.getKeyCode() == KeyEvent.VK_C)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-                  CoppyAction();
+        if ((evt.getKeyCode() == KeyEvent.VK_C) && ((evt.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
+            CoppyAction();
         }
-        if ((evt.getKeyCode() == KeyEvent.VK_X)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-                  cutAction();
+        if ((evt.getKeyCode() == KeyEvent.VK_X) && ((evt.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
+            cutAction();
         }
-         if ((evt.getKeyCode() == KeyEvent.VK_V)&&((evt.getModifiersEx()&KeyEvent.CTRL_DOWN_MASK)!=0)) {
-                  pasteAction();
+        if ((evt.getKeyCode() == KeyEvent.VK_V) && ((evt.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
+            pasteAction();
         }
-        
+
     }//GEN-LAST:event_jScrollPane2KeyPressed
 
     private void itemFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFolderActionPerformed
         // TODO add your handling code here:
-        if(saveSelectedNode.toString().equals("ThisPC"))return;
-        int dem=1;
-        String str="New folder";
-        
-        DefaultTableModel model=(DefaultTableModel) Table.getModel();
-        
-        String path=saveSelectedNode.toString();
-        
-        while(new File(path+"\\"+str+"("+dem+")").exists()){
+        if (saveSelectedNode.toString().equals("ThisPC")) {
+            return;
+        }
+        int dem = 1;
+        String str = "New folder";
+
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+
+        String path = saveSelectedNode.toString();
+
+        while (new File(path + "\\" + str + "(" + dem + ")").exists()) {
             dem++;
         };
-        
-        path=path+"\\"+str+"("+dem+")";
-        File newFolder=new File(path);
-        
-        try{
+
+        path = path + "\\" + str + "(" + dem + ")";
+        File newFolder = new File(path);
+
+        try {
             newFolder.mkdir();
+        } catch (Exception ex) {
+
         }
-        catch(Exception ex){
-            
-        }
-        
+
         loadTableWhenAction();
-        
-        
-        String abc=newFolder.getName();
-        for(int i=0;i<Table.getRowCount();i++)
-        {
-            String temp=(String)Table.getValueAt(i, 0);
-            if(temp.equals(abc))
-            {
+
+        String abc = newFolder.getName();
+        for (int i = 0; i < Table.getRowCount(); i++) {
+            String temp = (String) Table.getValueAt(i, 0);
+            if (temp.equals(abc)) {
                 Table.setRowSelectionInterval(i, i);
-                isTaoMoiThuMuc=true;
+                isTaoMoiThuMuc = true;
                 Table.editCellAt(i, 0);
                 return;
-            }   
-        }    
+            }
+        }
     }//GEN-LAST:event_itemFolderActionPerformed
 
     private void itemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemExitActionPerformed
@@ -2056,9 +1936,9 @@ public class MainForm extends javax.swing.JFrame {
 
     private void itemRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRenameActionPerformed
         // TODO add your handling code here:
-        
-        isRenameClick=true; 
-        int rowSua=Table.getSelectedRow();
+
+        isRenameClick = true;
+        int rowSua = Table.getSelectedRow();
         Table.editCellAt(rowSua, 0);
     }//GEN-LAST:event_itemRenameActionPerformed
 
@@ -2071,7 +1951,7 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         loadTableWhenAction();
         //duong dan file dang duoc chon
-        
+
     }//GEN-LAST:event_btnRefreshActionPerformed
 
 
@@ -2092,45 +1972,42 @@ public class MainForm extends javax.swing.JFrame {
 
     private void itemFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemFileActionPerformed
         // TODO add your handling code here:
-        
-        if(saveSelectedNode.toString().equals("ThisPC"))return;
-        int dem=1;
-        String str="New File";
-        DefaultTableModel model=(DefaultTableModel) Table.getModel();
-        
-        String path=saveSelectedNode.toString();
-        
-        while(new File(path+"\\"+str+"("+dem+")").exists()){
+
+        if (saveSelectedNode.toString().equals("ThisPC")) {
+            return;
+        }
+        int dem = 1;
+        String str = "New File";
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+
+        String path = saveSelectedNode.toString();
+
+        while (new File(path + "\\" + str + "(" + dem + ")").exists()) {
             dem++;
         };
-        
-        path=path+"\\"+str+"("+dem+")";
-        File xx=new File(path);
-        
-        try{
+
+        path = path + "\\" + str + "(" + dem + ")";
+        File xx = new File(path);
+
+        try {
             xx.createNewFile();
-        }
-        catch(Exception ex){
-            
+        } catch (Exception ex) {
+
         }
         loadTableWhenAction();
-        
-        
-        String abc=xx.getName();
-        for(int i=0;i<Table.getRowCount();i++)
-        {
-            String temp=(String)Table.getValueAt(i, 0);
-            if(temp.equals(abc))
-            {
+
+        String abc = xx.getName();
+        for (int i = 0; i < Table.getRowCount(); i++) {
+            String temp = (String) Table.getValueAt(i, 0);
+            if (temp.equals(abc)) {
                 Table.setRowSelectionInterval(i, i);
-                isTaoMoiFile=true;
+                isTaoMoiFile = true;
                 Table.editCellAt(i, 0);
                 return;
-            }   
+            }
         }
-        
-        
-        
+
+
     }//GEN-LAST:event_itemFileActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -2138,48 +2015,48 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     //</editor-fold>
-    
+
     private void TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseReleased
-        if(saveSelectedNode==null || saveSelectedNode.toString().equals("ThisPC")) 
+        if (saveSelectedNode == null || saveSelectedNode.toString().equals("ThisPC")) {
             return;
-        if(evt.isPopupTrigger())
-        {
+        }
+        if (evt.isPopupTrigger()) {
             setEnableItems();
-            if(Table.getSelectedRowCount()>0)
-            {
+            if (Table.getSelectedRowCount() > 0) {
                 setHiddenCheck.setEnabled(true);
-                if(Table.getSelectedRowCount()>1) setHiddenCheck.setEnabled(false);
-                else
-                {
-                    JTable source = (JTable)evt.getSource();
-                    int row = source.rowAtPoint( evt.getPoint() );
-                    int column = source.columnAtPoint( evt.getPoint() );
-            
-                    String str=saveSelectedNode.toString()+"\\"+(String)source.getModel().getValueAt(row, 0);
-                    File s=new File(str);
-                    if(s.isHidden()) setHiddenCheck.setState(true);
-                    else setHiddenCheck.setState(false);
+                if (Table.getSelectedRowCount() > 1) {
+                    setHiddenCheck.setEnabled(false);
+                } else {
+                    JTable source = (JTable) evt.getSource();
+                    int row = source.rowAtPoint(evt.getPoint());
+                    int column = source.columnAtPoint(evt.getPoint());
+
+                    String str = saveSelectedNode.toString() + "\\" + (String) source.getModel().getValueAt(row, 0);
+                    File s = new File(str);
+                    if (s.isHidden()) {
+                        setHiddenCheck.setState(true);
+                    } else {
+                        setHiddenCheck.setState(false);
+                    }
                 }
                 popupMenu.show(this, 0, 0);
                 popupMenu.setLocation(MouseInfo.getPointerInfo().getLocation());
-            }
-            else
-            {
+            } else {
                 popupMenuPanel.show(this, 0, 0);
                 popupMenuPanel.setLocation(MouseInfo.getPointerInfo().getLocation());
             }
-            
+
         }
     }//GEN-LAST:event_TableMouseReleased
 
     private void jScrollPane2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseReleased
         // TODO add your handling code here:
-        if(saveSelectedNode==null || saveSelectedNode.toString().equals("ThisPC")) 
+        if (saveSelectedNode == null || saveSelectedNode.toString().equals("ThisPC")) {
             return;
+        }
         jScrollPane2.requestFocus();
         System.out.println("I'm in croll pane 2");
-        if(evt.isPopupTrigger())
-        {
+        if (evt.isPopupTrigger()) {
             setEnableItems();
             Table.clearSelection();
             popupMenuPanel.show(this, 0, 0);
@@ -2187,37 +2064,42 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jScrollPane2MouseReleased
 //<editor-fold defaultstate="collapsed" desc="JMenuItems, HIDDEN">
-    private void SetUpPopupMenus()
-    {
-        
+
+    private void SetUpPopupMenus() {
+
         jMenuItem2.setText("Copy             Ctrl+C");
         jMenuItem3.setText("Cut                Ctrl+X");
         jMenuItem4.setText("Delete");
         jMenuItem5.setText("Rename         F2");
         jMenuItem6.setText("Select All        Ctrl+A");
-        
+
         jMenuItem7.setText("Refresh");
         jMenuItem8.setText("Paste");
         jMenuItem9.setText("Folder");
         jMenuItem10.setText("File");
     }
-    
-    private void setEnableItems()
-    {
-        if(Table.getSelectedRowCount()>0) jMenuItem4.setEnabled(true);
-        else jMenuItem4.setEnabled(false);
-        if(Table.getSelectedRowCount()>1) jMenuItem5.setEnabled(false);
-        else jMenuItem5.setEnabled(true);
-        
-        if(copy || cut) jMenuItem8.setEnabled(true);
-        else jMenuItem8.setEnabled(false);
-        
-        
-    }
-    
-    
 
-    
+    private void setEnableItems() {
+        if (Table.getSelectedRowCount() > 0) {
+            jMenuItem4.setEnabled(true);
+        } else {
+            jMenuItem4.setEnabled(false);
+        }
+        if (Table.getSelectedRowCount() > 1) {
+            jMenuItem5.setEnabled(false);
+        } else {
+            jMenuItem5.setEnabled(true);
+        }
+
+        if (copy || cut) {
+            jMenuItem8.setEnabled(true);
+        } else {
+            jMenuItem8.setEnabled(false);
+        }
+
+    }
+
+
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
         btnCopyActionPerformed(evt);
@@ -2226,7 +2108,7 @@ public class MainForm extends javax.swing.JFrame {
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO add your handling code here:
         btnCutActionPerformed(evt);
-        
+
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -2266,47 +2148,49 @@ public class MainForm extends javax.swing.JFrame {
 
     private void hiddenCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hiddenCheckActionPerformed
         // TODO add your handling code here:
-        java.awt.event.MouseEvent evtx=new java.awt.event.MouseEvent(this,1,1,1,1,1,1,true);
-        isHidden=true;
+        java.awt.event.MouseEvent evtx = new java.awt.event.MouseEvent(this, 1, 1, 1, 1, 1, 1, true);
+        isHidden = true;
         TreeMouseClicked(evtx);
-        
+
     }//GEN-LAST:event_hiddenCheckActionPerformed
 
     private void setHiddenCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setHiddenCheckActionPerformed
         // TODO add your handling code here:
         //JTable source = (JTable)evt.getSource();
-        
+
         int row = Table.getSelectedRow();
-        String str=saveSelectedNode.toString()+"\\"+(String)Table.getModel().getValueAt(row, 0);
-        File s=new File(str);
+        String str = saveSelectedNode.toString() + "\\" + (String) Table.getModel().getValueAt(row, 0);
+        File s = new File(str);
         Path filePath = Paths.get(str);
-        setHiddenAttrib(filePath,!(s.isHidden()));
+        setHiddenAttrib(filePath, !(s.isHidden()));
         //show lại trên table
-        String pathStr=(String)saveSelectedNode.getUserObject();
-        java.io.File selectedFile =new File(pathStr);
-        java.io.File[] pathss=selectedFile.listFiles();
-        if(pathStr=="ThisPC") 
-            pathss=java.io.File.listRoots();
-    
-        ShowInTable(pathss,saveSelectedNode);
+        String pathStr = (String) saveSelectedNode.getUserObject();
+        java.io.File selectedFile = new File(pathStr);
+        java.io.File[] pathss = selectedFile.listFiles();
+        if (pathStr == "ThisPC") {
+            pathss = java.io.File.listRoots();
+        }
+
+        ShowInTable(pathss, saveSelectedNode);
     }//GEN-LAST:event_setHiddenCheckActionPerformed
 //</editor-fold>
-    
+
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // TODO add your handling code here:
-        if(saveSelectedNode.toString().equals("ThisPC")) return;
-        isSearching=true;
-        DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
-        
-        while(tableModel.getRowCount() > 0)
-        {
+        if (saveSelectedNode.toString().equals("ThisPC")) {
+            return;
+        }
+        isSearching = true;
+        DefaultTableModel tableModel = (DefaultTableModel) Table.getModel();
+
+        while (tableModel.getRowCount() > 0) {
             tableModel.removeRow(0);
         }
-        String pathStr=(String)saveSelectedNode.getUserObject();
-        java.io.File selectedFile =new File(pathStr);
-        
-        addItemSearchToTable(selectedFile,tableModel);
-        
+        String pathStr = (String) saveSelectedNode.getUserObject();
+        java.io.File selectedFile = new File(pathStr);
+
+        addItemSearchToTable(selectedFile, tableModel);
+
         //Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
     }//GEN-LAST:event_btnSearchActionPerformed
 
@@ -2316,13 +2200,13 @@ public class MainForm extends javax.swing.JFrame {
 
     private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
         // TODO add your handling code here:
-        if(jTextField1.getText().equals("Search.."))
+        if (jTextField1.getText().equals("Search.."))
             jTextField1.setText("");
     }//GEN-LAST:event_jTextField1MouseClicked
 
     private void jTextField1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseExited
         // TODO add your handling code here:
-        if(jTextField1.getText().equals(""))
+        if (jTextField1.getText().equals(""))
             jTextField1.setText("Search..");
     }//GEN-LAST:event_jTextField1MouseExited
     private static String toHex(byte[] bytes) {
@@ -2330,70 +2214,81 @@ public class MainForm extends javax.swing.JFrame {
     }
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // TODO add your handling code here:
-        int r=Table.getSelectedRow();
-        if(r<0) return;
-        String path=Table.getValueAt(r, 0).toString();
-        if(new File(path).isFile()==false)
+        int r = Table.getSelectedRow();
+        if (r < 0) {
             return;
-        File f=new File(path);
-        String name=f.getName();
-        long size=f.length()/1000;
-        String hash=(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase();
-        CheckFormInformation c=new CheckFormInformation("MD5", hash, name, size);
+        }
+        String path = Table.getValueAt(r, 0).toString();
+        if (new File(path).isFile() == false) {
+            return;
+        }
+        File f = new File(path);
+        String name = f.getName();
+        long size = f.length() / 1000;
+        String hash = (toHex(Hash.MD5.checksum(new File(path))) + "").toUpperCase();
+        CheckFormInformation c = new CheckFormInformation("MD5", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.MD5.checksum(new File(path)))+"").toUpperCase(),"MD5",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
-        int r=Table.getSelectedRow();
-        if(r<0) return;
-        String path=Table.getValueAt(r, 0).toString();
-        if(new File(path).isFile()==false)
+        int r = Table.getSelectedRow();
+        if (r < 0) {
             return;
-        try{
-            long crc=CRC32.checksumMappedFile(path);
-            File f=new File(path);
-            String name=f.getName();
-            long size=f.length()/1000;
-            String hash=(Long.toHexString(crc)+"").toUpperCase();
-            CheckFormInformation c=new CheckFormInformation("CRC32", hash, name, size);
+        }
+        String path = Table.getValueAt(r, 0).toString();
+        if (new File(path).isFile() == false) {
+            return;
+        }
+        try {
+            long crc = CRC32.checksumMappedFile(path);
+            File f = new File(path);
+            String name = f.getName();
+            long size = f.length() / 1000;
+            String hash = (Long.toHexString(crc) + "").toUpperCase();
+            CheckFormInformation c = new CheckFormInformation("CRC32", hash, name, size);
             c.setVisible(true);
             //JOptionPane.showMessageDialog(null,(Long.toHexString(crc)+"").toUpperCase(),"CRC32",JOptionPane.INFORMATION_MESSAGE);
-        }
-        catch(Exception e){
-            
+        } catch (Exception e) {
+
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
         // TODO add your handling code here:
-        int r=Table.getSelectedRow();
-        if(r<0) return;
-        String path=Table.getValueAt(r, 0).toString();
-        if(new File(path).isFile()==false)
+        int r = Table.getSelectedRow();
+        if (r < 0) {
             return;
-        File f=new File(path);
-        String name=f.getName();
-        long size=f.length()/1000;
-        String hash=(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase();
-        CheckFormInformation c=new CheckFormInformation("SHA1", hash, name, size);
+        }
+        String path = Table.getValueAt(r, 0).toString();
+        if (new File(path).isFile() == false) {
+            return;
+        }
+        File f = new File(path);
+        String name = f.getName();
+        long size = f.length() / 1000;
+        String hash = (toHex(Hash.SHA1.checksum(new File(path))) + "").toUpperCase();
+        CheckFormInformation c = new CheckFormInformation("SHA1", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA1.checksum(new File(path)))+"").toUpperCase(),"SHA-1",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
         // TODO add your handling code here:
-        int r=Table.getSelectedRow();
-        if(r<0) return;
-        String path=Table.getValueAt(r, 0).toString();
-        if(new File(path).isFile()==false)
+        int r = Table.getSelectedRow();
+        if (r < 0) {
             return;
-        File f=new File(path);
-        String name=f.getName();
-        long size=f.length()/1000;
-        String hash=(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase();
-        CheckFormInformation c=new CheckFormInformation("SHA256", hash, name, size);
+        }
+        String path = Table.getValueAt(r, 0).toString();
+        if (new File(path).isFile() == false) {
+            return;
+        }
+        File f = new File(path);
+        String name = f.getName();
+        long size = f.length() / 1000;
+        String hash = (toHex(Hash.SHA256.checksum(new File(path))) + "").toUpperCase();
+        CheckFormInformation c = new CheckFormInformation("SHA256", hash, name, size);
         c.setVisible(true);
         //JOptionPane.showMessageDialog(null,(toHex(Hash.SHA256.checksum(new File(path)))+"").toUpperCase(),"SHA-256",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
@@ -2403,59 +2298,58 @@ public class MainForm extends javax.swing.JFrame {
         Extract();
     }//GEN-LAST:event_btnExtractActionPerformed
 
-        
-    private void addItemSearchToTable(File file,DefaultTableModel tableModel){
-        java.io.File[] pathss=file.listFiles();
-        int n=pathss.length;
-        Object row[]=new Object[5];
-        for(int i=0;i<n;i++)
-            if(!(pathss[i].isHidden() && hiddenCheck.getState()==false))
-                if(pathss[i].isDirectory() )
-                {
-                    
-                    if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
-                    {
+    private void addItemSearchToTable(File file, DefaultTableModel tableModel) {
+        java.io.File[] pathss = file.listFiles();
+        int n = pathss.length;
+        Object row[] = new Object[5];
+        for (int i = 0; i < n; i++) {
+            if (!(pathss[i].isHidden() && hiddenCheck.getState() == false)) {
+                if (pathss[i].isDirectory()) {
+
+                    if (pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase()) != -1) {
 //                        if(pathss[i].getAbsolutePath().length()!=3)
 //                        row[0]=pathss[i].getName();              
 //                        else
-                            row[0]=pathss[i].getAbsolutePath();
+                        row[0] = pathss[i].getAbsolutePath();
                         Date d = new Date(pathss[i].lastModified());
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                         String strDate = formatter.format(d);
-                        row[1]=strDate;
-                        row[2]="Folder";
-                        row[3]="N/A";
-                        row[4]=pathss[i].getAbsolutePath();
+                        row[1] = strDate;
+                        row[2] = "Folder";
+                        row[3] = "N/A";
+                        row[4] = pathss[i].getAbsolutePath();
                         tableModel.addRow(row);
                     }
-                    addItemSearchToTable(pathss[i],tableModel);
+                    addItemSearchToTable(pathss[i], tableModel);
                 }
-        
-        for(int i=0;i<n;i++)
-            if(!(pathss[i].isHidden() && hiddenCheck.getState()==false))
-                if(pathss[i].isFile() )
-                {
-                    
-                    if(pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase())!=-1)
-                    {
-                        
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (!(pathss[i].isHidden() && hiddenCheck.getState() == false)) {
+                if (pathss[i].isFile()) {
+
+                    if (pathss[i].getName().toLowerCase().indexOf(jTextField1.getText().toLowerCase()) != -1) {
+
                         //row[0]=pathss[i].getName();
-                        row[0]=pathss[i].getAbsolutePath();
+                        row[0] = pathss[i].getAbsolutePath();
                         Date d = new Date(pathss[i].lastModified());
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                         String strDate = formatter.format(d);
-                        row[1]=strDate;
-                        row[2]="File";
-                        row[3]=pathss[i].length()/1000+" KB";
-                        row[4]=pathss[i].getAbsolutePath();
+                        row[1] = strDate;
+                        row[2] = "File";
+                        row[3] = pathss[i].length() / 1000 + " KB";
+                        row[4] = pathss[i].getAbsolutePath();
                         tableModel.addRow(row);
                     }
-                    
+
                 }
-        
+            }
+        }
+
     }
-    
-    private static void setHiddenAttrib(Path filePath,boolean hide) {        
+
+    private static void setHiddenAttrib(Path filePath, boolean hide) {
         try {
             DosFileAttributes attr = Files.readAttributes(filePath, DosFileAttributes.class);
             System.out.println(filePath.getFileName() + " Hidden attribute is " + attr.isHidden());
@@ -2465,210 +2359,230 @@ public class MainForm extends javax.swing.JFrame {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } 
+        }
     }
-    
-    void ShowInTable(File[] paths,DefaultMutableTreeNode selectedNode)
-    {
-        int dem=0;
-        int n=paths.length;
-        Object row[]=new Object[4];
 
-        DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
-        
-        while(tableModel.getRowCount() > 0)
-        {
+    void ShowInTable(File[] paths, DefaultMutableTreeNode selectedNode) {
+        int dem = 0;
+        int n = paths.length;
+        Object row[] = new Object[4];
+
+        DefaultTableModel tableModel = (DefaultTableModel) Table.getModel();
+
+        while (tableModel.getRowCount() > 0) {
             tableModel.removeRow(0);
         }
-        
 
-        
-        for(int i=0;i<n;i++)
-            if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
-                if(paths[i].isDirectory() )
-                {
+        for (int i = 0; i < n; i++) {
+            if (!(paths[i].isHidden() && hiddenCheck.getState() == false)) {
+                if (paths[i].isDirectory()) {
 
 //                    if(paths[i].getAbsolutePath().length()!=3)
 //                    row[0]=paths[i].getName();              
 //                    else
-                        row[0]=paths[i].getAbsolutePath();
+                    row[0] = paths[i].getAbsolutePath();
                     Date d = new Date(paths[i].lastModified());
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                     String strDate = formatter.format(d);
-                    row[1]=strDate;
-                    row[2]="Folder";
-                    if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
-                    row[3]="N/A";
-                    if(selectedNode.toString().equals("ThisPC")) row[3]="loading...";
+                    row[1] = strDate;
+                    row[2] = "Folder";
+                    if (selectedNode.toString().equals("ThisPC")) {
+                        row[2] = "Disk";
+                    }
+                    row[3] = "N/A";
+                    if (selectedNode.toString().equals("ThisPC")) {
+                        row[3] = "loading...";
+                    }
                     tableModel.addRow(row);
                 }
-        for(int i=0;i<n;i++)
-            if(!(paths[i].isHidden() && hiddenCheck.getState()==false))
-                if(paths[i].isFile() )
-                {
-                   
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (!(paths[i].isHidden() && hiddenCheck.getState() == false)) {
+                if (paths[i].isFile()) {
+
                     //row[0]=paths[i].getName();
-                    row[0]=paths[i].getAbsolutePath();
+                    row[0] = paths[i].getAbsolutePath();
                     Date d = new Date(paths[i].lastModified());
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy   HH:mm:ss");
                     String strDate = formatter.format(d);
-                    row[1]=strDate;
-                    row[2]="File";
-                    if(selectedNode.toString().equals("ThisPC")) row[2]="Disk";
-                    row[3]=paths[i].length()/1000+" KB";
+                    row[1] = strDate;
+                    row[2] = "File";
+                    if (selectedNode.toString().equals("ThisPC")) {
+                        row[2] = "Disk";
+                    }
+                    row[3] = paths[i].length() / 1000 + " KB";
                     tableModel.addRow(row);
                 }
-        
-        
-        
+            }
+        }
+
         Table.getColumnModel().getColumn(0).setCellRenderer(new TableRender());
-        
-        
+
     }
-    
-    private void loadTree()
-    {
+
+    private void loadTree() {
         paths = java.io.File.listRoots();
 
-        DefaultTreeModel model=(DefaultTreeModel)Tree.getModel();
-        DefaultMutableTreeNode ThisPC=(DefaultMutableTreeNode)model.getRoot();
-        
-      
-        for(File path:paths)
-        {
-            String pathStr=path.getAbsolutePath();
+        DefaultTreeModel model = (DefaultTreeModel) Tree.getModel();
+        DefaultMutableTreeNode ThisPC = (DefaultMutableTreeNode) model.getRoot();
+
+        for (File path : paths) {
+            String pathStr = path.getAbsolutePath();
             ThisPC.add(new DefaultMutableTreeNode(pathStr));
             model.reload();
         }
-        saveSelectedNode=ThisPC;
-        treeRoot=saveSelectedNode;
+        saveSelectedNode = ThisPC;
+        treeRoot = saveSelectedNode;
     }
-    
-    private void loadTable()
-    {
+
+    private void loadTable() {
         Table.setBackground(Color.WHITE);
         Table.setDefaultEditor(Object.class, new CustomEditor(new JTextField()));
         JTableHeader header = Table.getTableHeader();
         header.setPreferredSize(new Dimension(100, 30));
-        header.setFont(new Font("",Font.PLAIN,18));
-        int n=0;
-        Object name[]=new Object[n];
-        Object date_modified[]=new Object[n];
-        Object type[]=new Object[n];
-        Object size[]=new Object[n];
-        Object path[]=new Object[n];
-        DefaultTableModel tableModel=(DefaultTableModel)Table.getModel();
-        tableModel.addColumn("Name",name);
-        tableModel.addColumn("Date modified",date_modified);
-        tableModel.addColumn("Type",type);
-        tableModel.addColumn("Size",size);
-        tableModel.addColumn("Path",path);
+        header.setFont(new Font("", Font.PLAIN, 18));
+        int n = 0;
+        Object name[] = new Object[n];
+        Object date_modified[] = new Object[n];
+        Object type[] = new Object[n];
+        Object size[] = new Object[n];
+        Object path[] = new Object[n];
+        DefaultTableModel tableModel = (DefaultTableModel) Table.getModel();
+        tableModel.addColumn("Name", name);
+        tableModel.addColumn("Date modified", date_modified);
+        tableModel.addColumn("Type", type);
+        tableModel.addColumn("Size", size);
+        tableModel.addColumn("Path", path);
     }
-    
-    public void Extract(){
+
+    public void Extract() {
         String tmpEx;
-         //lấy node được chọn
-        DefaultMutableTreeNode selectedNode=(DefaultMutableTreeNode)Tree.getLastSelectedPathComponent();
+        //lấy node được chọn
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
         //if(selectedNode!=null) 
         //selectedNode.removeAllChildren();
-      
-        String str=(String)selectedNode.getUserObject();
-        java.io.File selectedFile =new File(str);
+
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
         java.io.File[] pathfirst = selectedFile.listFiles();
-        int length=pathfirst.length;
-        int dem=0;
-        
+        int length = pathfirst.length;
+        int dem = 0;
+
         paths = new File[length];
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory())
-            {
-                 paths[dem]=pathfirst[i];
-                 dem++;
-            }   
-        }
-        for(int i=0;i<length;i++)
-        {
-            if(pathfirst[i].isDirectory()==false)
-            {
-                paths[dem]=pathfirst[i];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
                 dem++;
-            }       
+            }
         }
-        
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+
         DefaultTableModel model = (DefaultTableModel) Table.getModel();
         int SelectedRowIndex = Table.getSelectedRow();
         fileEx = paths[SelectedRowIndex];
         System.out.println(fileEx.toString());
-        tmpEx=fileEx.getName();
-        if(tmpEx.lastIndexOf(".") != -1 && tmpEx.lastIndexOf(".") != 0)
-        {
-         tmpEx = tmpEx.substring(tmpEx.lastIndexOf(".")+1);
-         System.out.println(tmpEx);
-        }
-        else 
+        tmpEx = fileEx.getName();
+        if (tmpEx.lastIndexOf(".") != -1 && tmpEx.lastIndexOf(".") != 0) {
+            tmpEx = tmpEx.substring(tmpEx.lastIndexOf(".") + 1);
+            System.out.println(tmpEx);
+        } else {
             return;
-         
-        if(tmpEx.equals("zip"))
-        {
+        }
+
+        if (tmpEx.equals("zip")) {
             System.out.println("It's zip");
-             // Tạo một buffer (Bộ đệm).
-        byte[] buffer = new byte[1024];
- 
-        ZipInputStream zipIs = null;
-        try {
-            // Tạo đối tượng ZipInputStream để đọc file từ 1 đường dẫn (path).
-            zipIs = new ZipInputStream(new FileInputStream(fileEx));
- 
-            ZipEntry entry = null;
-            // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
-            while ((entry = zipIs.getNextEntry()) != null) {
-                String entryName = entry.getName();
-                String outFileName = selectedFile + "\\\\"+ entryName;
-                System.out.println("Unzip: " + outFileName);
- 
-                if (entry.isDirectory()) {
-                    // Tạo các thư mục.
-                    new File(outFileName).mkdirs();
-                } else {
-                    // Tạo một Stream để ghi dữ liệu vào file.
-                    FileOutputStream fos = new FileOutputStream(outFileName);
- 
-                    int len;
-                    // Đọc dữ liệu trên Entry hiện tại.
-                    while ((len = zipIs.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                    }
- 
-                    fos.close();
-                }
- 
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            // Tạo một buffer (Bộ đệm).
+            byte[] buffer = new byte[1024];
+
+            ZipInputStream zipIs = null;
             try {
-                zipIs.close();
+                // Tạo đối tượng ZipInputStream để đọc file từ 1 đường dẫn (path).
+                zipIs = new ZipInputStream(new FileInputStream(fileEx));
+
+                ZipEntry entry = null;
+                // Duyệt từng Entry (Từ trên xuống dưới cho tới hết)
+                while ((entry = zipIs.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    String outFileName = selectedFile + "\\\\" + entryName;
+                    System.out.println("Unzip: " + outFileName);
+
+                    if (entry.isDirectory()) {
+                        // Tạo các thư mục.
+                        new File(outFileName).mkdirs();
+                    } else {
+                        // Tạo một Stream để ghi dữ liệu vào file.
+                        FileOutputStream fos = new FileOutputStream(outFileName);
+
+                        int len;
+                        // Đọc dữ liệu trên Entry hiện tại.
+                        while ((len = zipIs.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+
+                        fos.close();
+                    }
+
+                }
             } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    zipIs.close();
+                } catch (Exception e) {
+                }
             }
+        } else if (tmpEx.equals("rar")) {
+            try {
+                Junrar.extract(fileEx, selectedFile);
+            } catch (Exception e) {
+                //throw don't care
+            }
+        } else if (tmpEx.equals("7z")) {
+            SevenZFile sevenZFile = null;
+            SevenZArchiveEntry entry = null;
+            try {
+                sevenZFile = new SevenZFile(fileEx);
+                entry = sevenZFile.getNextEntry();
+            } catch (Exception e) {
+                //throw don't care
+            }
+            while (entry != null) {
+                try {
+                    System.out.println(entry.getName());
+                    FileOutputStream out=null;
+                    try {
+                        out = new FileOutputStream(entry.getName());
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    byte[] content = new byte[(int) entry.getSize()];
+                    sevenZFile.read(content, 0, content.length);
+                    try{
+                    out.write(content);
+                    out.close();
+                    entry = sevenZFile.getNextEntry();
+                    sevenZFile.close();
+                    }
+                    catch(Exception e)
+                    {
+                        //throw
+                    }
+                    
+                } catch (IOException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }
+
         }
     }
-        else
-             if(tmpEx.equals("rar"))
-        {
-            try{
-                 Junrar.extract(fileEx, selectedFile);
-            }
-           catch(Exception e)
-           {
-               //throw don't care
-           }
-        }
-        
-    }
-      
- 
-    
+
     /**
      * @param args the command line arguments
      */
@@ -2704,8 +2618,7 @@ public class MainForm extends javax.swing.JFrame {
         });
     }
 
-   
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu Edit;
     private javax.swing.JMenu File;
@@ -2736,6 +2649,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem itemPaste;
     private javax.swing.JMenuItem itemRename;
     private javax.swing.JMenuItem itemSellectAll;
+    private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -2778,4 +2692,3 @@ public class MainForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
 }
-
