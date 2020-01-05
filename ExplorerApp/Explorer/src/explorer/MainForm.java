@@ -397,6 +397,7 @@ public class MainForm extends javax.swing.JFrame {
         itemPaste = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         itemSellectAll = new javax.swing.JMenuItem();
+        jMenuItem14 = new javax.swing.JMenuItem();
         Help = new javax.swing.JMenu();
         itemAbout = new javax.swing.JMenuItem();
         View = new javax.swing.JMenu();
@@ -976,6 +977,15 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         Edit.add(itemSellectAll);
+
+        jMenuItem14.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jMenuItem14.setText("Add jar");
+        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem14ActionPerformed(evt);
+            }
+        });
+        Edit.add(jMenuItem14);
 
         jMenuBar1.add(Edit);
 
@@ -2317,6 +2327,11 @@ public class MainForm extends javax.swing.JFrame {
         addToArchive();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
+        // TODO add your handling code here:
+        addToJar();
+    }//GEN-LAST:event_jMenuItem14ActionPerformed
+
     private void addItemSearchToTable(File file, DefaultTableModel tableModel) {
         java.io.File[] pathss = file.listFiles();
         int n = pathss.length;
@@ -2744,6 +2759,103 @@ public class MainForm extends javax.swing.JFrame {
         }
        loadTableWhenAction();
     }
+    
+     public void addToJar() {
+        //lấy node được chọn
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) Tree.getLastSelectedPathComponent();
+        //if(selectedNode!=null) 
+        //selectedNode.removeAllChildren();
+
+        String str = (String) selectedNode.getUserObject();
+        java.io.File selectedFile = new File(str);
+        java.io.File[] pathfirst = selectedFile.listFiles();
+        int length = pathfirst.length;
+        int dem = 0;
+
+        paths = new File[length];
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory()) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+        for (int i = 0; i < length; i++) {
+            if (pathfirst[i].isDirectory() == false) {
+                paths[dem] = pathfirst[i];
+                dem++;
+            }
+        }
+
+        DefaultTableModel model = (DefaultTableModel) Table.getModel();
+        int[] SelectedRowIndex = Table.getSelectedRows();
+        if (SelectedRowIndex.length == 0) {
+            return;
+        }
+        ArrFileEx = new File[SelectedRowIndex.length];
+        tmpF = new String[SelectedRowIndex.length];
+        for (int i = 0; i < SelectedRowIndex.length; i++) {
+            fileAr = paths[SelectedRowIndex[i]];
+            ArrFileEx[i] = fileAr;
+        }
+        int g = -1;
+        String nameAr=null;
+        while (g < 0) {
+            String input = JOptionPane.showInputDialog("Vui lòng nhập tên file nén");
+            Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
+
+            if (regex.matcher(input).find() == false && input!=null) {
+                g++;
+                nameAr = input;
+            }
+        }
+        byte[] buffer = new byte[1024];
+        FileOutputStream fileOs = null;
+        JarOutputStream zipOs = null;
+        try {
+            fileOs = new FileOutputStream(new File(selectedFile.toString()+"\\\\"+nameAr+".jar"));
+            zipOs = new JarOutputStream(fileOs);
+            List<File> allFiles = this.listChildFiles(selectedFile,0,ArrFileEx);
+              for (File file : allFiles) {
+                String filePath = file.getAbsolutePath();
+                System.out.println("Zipping " + filePath);
+                // entryName: is a relative path.
+                String entryName = filePath.substring(selectedFile.getAbsolutePath().length() + 1);
+                if(file.isDirectory())
+                {
+                    entryName+="\\";
+                }
+                 System.out.println("Zipping " + entryName);
+                JarEntry ze = new JarEntry(entryName);
+                // Thêm entry vào file jar.
+                zipOs.putNextEntry(ze);
+                if(file.isFile())
+                {
+                try ( // Đọc dữ liệu của file và ghi vào ZipOutputStream.
+                        FileInputStream fileIs = new FileInputStream(filePath)) {
+                    int len;
+                    while ((len = fileIs.read(buffer)) > 0) {
+                        zipOs.write(buffer, 0, len);
+                    }
+                }
+                }
+                
+        }
+              
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                zipOs.close();
+            } catch (Exception e) {
+            }
+            try {
+                fileOs.close();
+            } catch (Exception e) {
+            }
+        }
+       loadTableWhenAction();
+    }
 
     private List<File> listChildFiles(File dir, int flag, File[] source) throws IOException {
         
@@ -2841,6 +2953,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
+    private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
