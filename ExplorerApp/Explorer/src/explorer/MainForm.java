@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -2653,8 +2654,9 @@ public class MainForm extends javax.swing.JFrame {
         try {
             fileOs = new FileOutputStream(new File(selectedFile.toString()+"\\\\"+nameAr+".zip"));
             zipOs = new ZipOutputStream(fileOs);
-            for (int i = 0; i < SelectedRowIndex.length; i++) {
-                String filePath = ArrFileEx[i].getAbsolutePath();
+            List<File> allFiles = this.listChildFiles(selectedFile,0,ArrFileEx);
+              for (File file : allFiles) {
+                String filePath = file.getAbsolutePath();
                 System.out.println("Zipping " + filePath);
                 // entryName: is a relative path.
                 String entryName = filePath.substring(selectedFile.getAbsolutePath().length() + 1);
@@ -2668,7 +2670,7 @@ public class MainForm extends javax.swing.JFrame {
                         zipOs.write(buffer, 0, len);
                     }
                 }
-            }
+        }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -2682,9 +2684,29 @@ public class MainForm extends javax.swing.JFrame {
             } catch (Exception e) {
             }
         }
-       loadTable();
+       loadTableWhenAction();
     }
 
+    private List<File> listChildFiles(File dir, int flag, File[] source) throws IOException {
+        
+        List<File> allFiles = new ArrayList<File>();
+        File[] childFiles;
+        if(flag!=0)
+            childFiles = dir.listFiles();
+        else
+            childFiles = source;
+        for (File file : childFiles) {
+            if (file.isFile()) {
+                allFiles.add(file);
+            } else {
+                List<File> files = this.listChildFiles(file, 1, source);
+                allFiles.addAll(files);
+            }
+        }
+        return allFiles;
+    }
+ 
+    
     /**
      * @param args the command line arguments
      */
