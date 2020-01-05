@@ -705,10 +705,11 @@ public class MainForm extends javax.swing.JFrame {
         jToolBar1.add(btnExtract);
 
         jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("jButton1");
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/explorer/image/archive.png"))); // NOI18N
+        jButton1.setText("Add to archive");
+        jButton1.setActionCommand("Archive");
         jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
